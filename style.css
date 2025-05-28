@@ -127,3 +127,22 @@ body, html {
   opacity: 1;
   pointer-events: auto;
 }
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 4px #ffaad4, 0 0 8px #ffc3d9;
+  }
+  100% {
+    text-shadow: 0 0 10px #ffaad4, 0 0 15px #ffc3d9;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(0.8) translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.4) translateY(-2px);
+    opacity: 1;
+  }
+}
