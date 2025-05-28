@@ -43,7 +43,7 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -60%);
     background: #fff;
     border-radius: 20px;
     width: 270px;
@@ -59,14 +59,13 @@
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease-in-out;
+    transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
   }
-
   .modal.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
   .modal button {
     margin-top: 15px;
     background: #d6336c;
@@ -142,12 +141,23 @@
   </div>
 
   <!-- Модалка подарка при 1000 -->
-  <div id="giftModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="giftTitle" aria-describedby="giftDesc">
-    <h2 id="giftTitle">🎉 Поздравляем!</h2>
-    <p id="giftDesc">Вы собрали <strong>1000 касаний 💖</strong></p>
-    <p>🎁 Подарок: Telegram Premium на 3 месяца</p>
-    <button id="closeGiftBtn">Закрыть</button>
+<div id="giftModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="giftTitle" aria-describedby="giftDesc">
+  <div class="gift-animation">
+    <div class="gift-box">
+      <div class="lid"></div>
+      <div class="box"></div>
+      <div class="ribbon"></div>
+    </div>
   </div>
+  <h2 id="giftTitle">🎉 Поздравляем!</h2>
+  <p id="giftDesc">Вы собрали <strong>1000 касаний 💖</strong></p>
+  <p>🎁 Подарок: Telegram Premium на 3 месяца</p>
+  <button id="claimGiftBtn">Получить</button>
+  <div id="loadingIndicator" style="display:none; margin-top: 15px;">
+  🔄 Активация...
+</div>
+  <button id="closeGiftBtn">Закрыть</button>
+</div>
 
   <canvas id="confetti-canvas"></canvas>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -342,14 +352,21 @@ socket.on('showGift', () => {
     // Логика при клике по экрану (кроме счётчика)
    document.body.addEventListener('click', (e) => {
   if (e.target === counter) return;
+       if (
+    progressModal.classList.contains('show') ||
+    motivationModal.classList.contains('show') ||
+    giftModal.classList.contains('show')
+  ) {
+    return; 
+  }
   createEmoji(e.clientX, e.clientY, '💗'); // Твой смайлик — сердечко
   myTouches++;
   socket.emit('touch', { roomId, x: e.clientX, y: e.clientY });
   updateCounter();
   const total = myTouches + friendTouches;
-  if (total % 100 === 0 && total !== 1000) {
-    socket.emit('showMotivation', { roomId, total });
-  }
+ if (total === 900) {
+  socket.emit('showMotivation', { roomId, total });
+}
   if (total === 1000) {
     socket.emit('showGift', { roomId });
   }
@@ -364,6 +381,21 @@ socket.on('showGift', () => {
 
     // Инициализация
     updateCounter();
+    const claimGiftBtn = document.getElementById('claimGiftBtn');
+claimGiftBtn.onclick = () => {
+  const loading = document.getElementById('loadingIndicator');
+  claimGiftBtn.disabled = true; // Блокируем кнопку, чтобы не спамили
+  loading.style.display = 'flex'; // Показываем индикатор
+
+  setTimeout(() => {
+    loading.style.display = 'none'; // Скрываем индикатор
+    claimGiftBtn.disabled = false; // Разблокируем кнопку
+    alert('Подарок активирован! Спасибо, что играете 😊');
+    closeModal(giftModal);
+  }, 2000); // 2 секунды имитация загрузки
+};
+
+
   </script>
 </body>
 </html>
