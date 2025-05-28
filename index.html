@@ -1,134 +1,181 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Touch Me Softly</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: #fff0f6;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Touch Me Softly</title>
+<style>
+  body {
+    margin: 0; padding: 20px;
+    background: #fff0f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .counter {
-      font-size: 18px;
-      padding: 12px 20px;
-      background: #ffe6f0;
-      border-radius: 16px;
-      box-shadow: 0 6px 15px rgba(255, 182, 193, 0.6);
-      color: #d6336c;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.3s ease;
-      z-index: 10;
-      position: relative;
-    }
+  /* Счётчик сверху */
+  #counter {
+    font-size: 18px;
+    background: #ffe6f0;
+    color: #d6336c;
+    border-radius: 16px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 6px 15px rgba(255, 182, 193, 0.6);
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+    width: fit-content;
+  }
+  #counter:hover {
+    background: #ffccdd;
+  }
 
-    .counter:hover {
-      background: #ffccdd;
-    }
+  /* Модалки */
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 20px;
+    width: 270px;
+    max-width: 90vw;
+    padding: 18px 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    font-size: 15px;
+    color: #000;
+    text-align: center;
+    box-sizing: border-box;
+    user-select: none;
+    word-wrap: break-word;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease-in-out;
+  }
 
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      border-radius: 20px;
-      width: 270px;
-      max-width: 90vw;
-      padding: 18px 20px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      font-size: 15px;
-      color: #000;
-      text-align: center;
-      user-select: none;
-      box-sizing: border-box;
-      word-wrap: break-word;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease-in-out;
-    }
+  .modal.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-    .modal.show {
+  .modal button {
+    margin-top: 15px;
+    background: #d6336c;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .modal button:hover {
+    background: #b02753;
+  }
+
+  /* Сердечки */
+  .heart {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    pointer-events: none;
+    background: url('data:image/svg+xml;utf8,<svg fill="%23d6336c" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3 9.24 3 10.91 3.81 12 5.09 13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') no-repeat center center;
+    background-size: contain;
+    animation: floatUp 1.2s ease forwards;
+    opacity: 1;
+    z-index: 1000;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) scale(1);
       opacity: 1;
-      pointer-events: auto;
     }
+    100% {
+      transform: translateY(-80px) scale(1.5);
+      opacity: 0;
+    }
+  }
 
-    .modal button {
-      margin-top: 15px;
-      background: #d6336c;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .modal button:hover {
-      background: #b02753;
-    }
-
-    #confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 2000;
-    }
-  </style>
+  /* Конфетти canvas */
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 2000;
+    display: none;
+  }
+</style>
 </head>
 <body>
 
-  <div class="counter" id="counter">Ты: 0 | Друг: 0</div>
+  <div id="counter" role="button" aria-label="Счётчик касаний">Ты: 0 | Друг: 0</div>
 
-  <!-- Модалка подарка 1000 касаний -->
-  <div id="giftModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
-    <h2 id="modalTitle">🎉 Поздравляем!</h2>
-    <p id="modalDesc">Вы собрали <strong>1000 касаний 💖</strong></p>
-    <p>🎁 Подарок: Telegram Premium на 3 месяца</p>
-    <button id="closeGiftBtn">Закрыть</button>
+  <!-- Модалка прогресса -->
+  <div id="progressModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="progressTitle" aria-describedby="progressDesc">
+    <h3 id="progressTitle">💖 Ваш прогресс</h3>
+    <p>Ты: <span id="progressMy">0</span></p>
+    <p>Друг: <span id="progressFriend">0</span></p>
+    <p>Всего: <span id="progressTotal">0</span></p>
+    <p>До подарка осталось: <span id="progressLeft">1000</span></p>
+    <button id="closeProgressBtn">Ок</button>
   </div>
 
-  <!-- Мотивационная модалка при каждой сотне -->
+  <!-- Модалка мотивации при 100, 200, ... -->
   <div id="motivationModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="motivationTitle" aria-describedby="motivationDesc">
     <h3 id="motivationTitle">✨ Продолжайте в том же духе!</h3>
-    <p id="motivationDesc">Вам осталось накопить <span id="leftCount"></span> касаний</p>
+    <p>Вам осталось накопить <span id="motivationLeft"></span> касаний</p>
     <button id="closeMotivationBtn">Ок</button>
+  </div>
+
+  <!-- Модалка подарка при 1000 -->
+  <div id="giftModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="giftTitle" aria-describedby="giftDesc">
+    <h2 id="giftTitle">🎉 Поздравляем!</h2>
+    <p id="giftDesc">Вы собрали <strong>1000 касаний 💖</strong></p>
+    <p>🎁 Подарок: Telegram Premium на 3 месяца</p>
+    <button id="closeGiftBtn">Закрыть</button>
   </div>
 
   <canvas id="confetti-canvas"></canvas>
 
   <script>
+    // Переменные счётчиков
+    let myTouches = 0;
+    let friendTouches = 0; // Пока просто 0, можно потом синхронизировать
+    let totalTouches = 0;
+
+    // Элементы
     const counter = document.getElementById('counter');
-    const giftModal = document.getElementById('giftModal');
+    const progressModal = document.getElementById('progressModal');
     const motivationModal = document.getElementById('motivationModal');
-    const leftCountSpan = document.getElementById('leftCount');
-    const closeGiftBtn = document.getElementById('closeGiftBtn');
+    const giftModal = document.getElementById('giftModal');
+
+    const progressMy = document.getElementById('progressMy');
+    const progressFriend = document.getElementById('progressFriend');
+    const progressTotal = document.getElementById('progressTotal');
+    const progressLeft = document.getElementById('progressLeft');
+
+    const motivationLeft = document.getElementById('motivationLeft');
+
+    const closeProgressBtn = document.getElementById('closeProgressBtn');
     const closeMotivationBtn = document.getElementById('closeMotivationBtn');
+    const closeGiftBtn = document.getElementById('closeGiftBtn');
+
     const confettiCanvas = document.getElementById('confetti-canvas');
     const ctx = confettiCanvas.getContext('2d');
 
-    let myTouches = 0;
-    let friendTouches = 0; // Для простоты пока не используем
-    let totalTouches = 0;
-
-    // Устанавливаем размер canvas равным окну
+    // Размер canvas под окно
     function resizeCanvas() {
       confettiCanvas.width = window.innerWidth;
       confettiCanvas.height = window.innerHeight;
@@ -136,7 +183,7 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Конфетти анимация
+    // Конфетти частицы
     class ConfettiParticle {
       constructor() {
         this.x = Math.random() * confettiCanvas.width;
@@ -146,7 +193,6 @@
         this.angle = Math.random() * 2 * Math.PI;
         this.spin = (Math.random() * 0.1) + 0.01;
         this.color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
-        this.opacity = 1;
       }
       update() {
         this.y += this.speed;
@@ -194,69 +240,104 @@
       ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
     }
 
-    // Открыть и закрыть модалки
-    function openGiftModal() {
-      giftModal.classList.add('show');
-      startConfetti();
+    // Функции открытия/закрытия модалок
+    function openModal(modal) {
+      modal.classList.add('show');
+    }
+    function closeModal(modal) {
+      modal.classList.remove('show');
     }
 
-    function closeGiftModal() {
-      giftModal.classList.remove('show');
-      stopConfetti();
-    }
+    // Закрытия по кнопкам
+    closeProgressBtn.onclick = () => closeModal(progressModal);
+    closeMotivationBtn.onclick = () => closeModal(motivationModal);
+    closeGiftBtn.onclick = () => closeModal(giftModal);
 
-    function openMotivationModal(remaining) {
-      leftCountSpan.textContent = remaining;
-      motivationModal.classList.add('show');
-      startConfetti();
-    }
-
-    function closeMotivationModal() {
-      motivationModal.classList.remove('show');
-      stopConfetti();
-    }
-
-    closeGiftBtn.addEventListener('click', closeGiftModal);
-    closeMotivationBtn.addEventListener('click', closeMotivationModal);
-
-    // Закрытие модалок по клику вне окна
+    // Закрытие по клику вне модалки
     window.addEventListener('click', (e) => {
-      if (e.target === giftModal) closeGiftModal();
-      if (e.target === motivationModal) closeMotivationModal();
+      if (e.target === progressModal) closeModal(progressModal);
+      if (e.target === motivationModal) closeModal(motivationModal);
+      if (e.target === giftModal) closeModal(giftModal);
     });
 
     // Закрытие по ESC
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (giftModal.classList.contains('show')) closeGiftModal();
-        if (motivationModal.classList.contains('show')) closeMotivationModal();
+        closeModal(progressModal);
+        closeModal(motivationModal);
+        closeModal(giftModal);
       }
     });
 
-    // Обработка кликов по счетчику
-    counter.addEventListener('click', () => {
-      openMotivationModal(1000 - totalTouches);
-    });
-
-    // Обработка касаний по всему экрану
-    window.addEventListener('click', () => {
-      myTouches++;
-      totalTouches = myTouches + friendTouches;
-
+    // Обновление счётчика на экране
+    function updateCounter() {
       counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+    }
 
-      // Каждые 100 касаний (кроме 1000)
-      if (totalTouches > 0 && totalTouches % 100 === 0 && totalTouches < 1000) {
-        openMotivationModal(1000 - totalTouches);
+    // Обновить модалку прогресса
+    function updateProgressModal() {
+      progressMy.textContent = myTouches;
+      progressFriend.textContent = friendTouches;
+      totalTouches = myTouches + friendTouches;
+      progressTotal.textContent = totalTouches;
+      progressLeft.textContent = Math.max(1000 - totalTouches, 0);
+    }
+
+    // Всплывашка мотивации при каждой сотне (кроме 1000)
+    function showMotivation() {
+      const left = 1000 - (myTouches + friendTouches);
+      motivationLeft.textContent = left > 0 ? left : 0;
+      openModal(motivationModal);
+      startConfetti();
+    }
+
+    // Всплывашка подарка при 1000
+    function showGift() {
+      openModal(giftModal);
+      startConfetti();
+    }
+
+    // Создаём сердечко по касанию
+    function createHeart(x, y) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = (x - 15) + 'px';
+      heart.style.top = (y - 15) + 'px';
+      document.body.appendChild(heart);
+      setTimeout(() => {
+        heart.remove();
+      }, 1200);
+    }
+
+    // Логика при клике по экрану (кроме счётчика)
+    document.body.addEventListener('click', (e) => {
+      // Игнорируем если клик по счётчику (там отдельный обработчик)
+      if (e.target === counter) return;
+
+      // Создаём сердечко там где клик
+      createHeart(e.clientX, e.clientY);
+
+      myTouches++;
+      updateCounter();
+
+      // Проверяем 100, 200, 300 ... кроме 1000
+      const total = myTouches + friendTouches;
+      if (total % 100 === 0 && total !== 1000) {
+        showMotivation();
       }
-
-      // При 1000 касаний
-      if (totalTouches >= 1000) {
-        openGiftModal();
+      if (total === 1000) {
+        showGift();
       }
     });
 
-  </script>
+    // При нажатии на счётчик показываем прогресс
+    counter.addEventListener('click', () => {
+      updateProgressModal();
+      openModal(progressModal);
+    });
 
+    // Инициализация
+    updateCounter();
+  </script>
 </body>
 </html>
