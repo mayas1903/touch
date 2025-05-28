@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=390, height=844, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Touch Me Softly</title>
+  <style>
+    /* Базовые стили под iPhone 13/14 */
+    html, body {
+      margin: 0; padding: 0;
+      width: 390px; 
+      height: 844px;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #fff0f5, #ffe6f0);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+    }
+
+    .counter {
+      position: fixed;
+      top: 20px; left: 20px; right: 20px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #d6336c;
+      background: rgba(255 255 255 / 0.9);
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(214,51,108,0.3);
+      cursor: pointer;
+      user-select: none;
+      z-index: 100;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      width: 320px;
+      max-width: 90vw;
+      padding: 25px 30px;
+      text-align: center;
+      z-index: 200;
+      font-size: 17px;
+      color: #222;
+      user-select: none;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-content button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      background: #d6336c;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .modal-content button:hover {
+      background: #a02a58;
+    }
+
+    #fireworks {
+      position: fixed;
+      top: 0; left: 0;
+      width: 390px;
+      height: 844px;
+      pointer-events: none;
+      z-index: 150;
+      user-select: none;
+    }
+  </style>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="counter" id="counter">Ты: 0 | Друг: 0</div>
+
+<div id="giftModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="giftTitle">
+  <div class="modal-content">
+    <h2 id="giftTitle">🎉 Поздравляем!</h2>
+    <p>Вы собрали <strong>1000 касаний 💖</strong></p>
+    <p>🎁 Подарок: Telegram Premium на 3 месяца</p>
+    <button onclick="closeModal()" aria-label="Закрыть окно с поздравлением">Закрыть</button>
+  </div>
+</div>
+
+<div id="counterModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="progressTitle">
+  <div class="modal-content">
+    <h3 id="progressTitle">💖 Ваш прогресс</h3>
+    <p>Ты: <span id="modalMy">0</span></p>
+    <p>Друг: <span id="modalFriend">0</span></p>
+    <p>Всего: <span id="modalTotal">0</span></p>
+    <p>До подарка: <span id="modalLeft">1000</span></p>
+    <button onclick="closeCounterModal()" aria-label="Закрыть окно с прогрессом">Ок</button>
+  </div>
+</div>
+
+<canvas id="fireworks" class="hidden"></canvas>
+
+<script src="script.js"></script>
+</body>
+</html>
