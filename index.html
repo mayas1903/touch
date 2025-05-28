@@ -324,16 +324,17 @@ socket.on('showGift', () => {
     }
 
     // Создаём сердечко по касанию
-    function createHeart(x, y) {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.style.left = (x - 35) + 'px';
-      heart.style.top = (y - 35) + 'px';
-      document.body.appendChild(heart);
-      setTimeout(() => {
-        heart.remove();
-      }, 1200);
-    }
+   function createHeart(x, y) {
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.style.left = (x - 35) + 'px';
+  heart.style.top = (y - 35) + 'px';
+  heart.textContent = '💗';  // вот тут смайлик
+  document.body.appendChild(heart);
+  setTimeout(() => {
+    heart.remove();
+  }, 1200);
+}
 
     // Логика при клике по экрану (кроме счётчика)
     document.body.addEventListener('click', (e) => {
