@@ -287,10 +287,12 @@ socket.on('connect', () => {
     }
 
     // Обработка касания друга от сервера
-socket.on('friendTouch', () => {
+socket.on('friendTouch', ({ x, y }) => {
   friendTouches++;
+  createHeart(x, y);  // рисуем сердечко там, где кликнул друг
   updateCounter();
 });
+
     
     // Обновить модалку прогресса
     function updateProgressModal() {
