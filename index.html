@@ -148,7 +148,7 @@
   </div>
 
   <canvas id="confetti-canvas"></canvas>
-
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     // Переменные счётчиков
     let myTouches = 0;
@@ -174,6 +174,11 @@
 
     const confettiCanvas = document.getElementById('confetti-canvas');
     const ctx = confettiCanvas.getContext('2d');
+const socket = io('https://immense-fantasy-turret.glitch.me');
+
+socket.on('connect', () => {
+  console.log('🧠 Подключились к WebSocket-серверу');
+});
 
     // Размер canvas под окно
     function resizeCanvas() {
@@ -274,6 +279,12 @@
       counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
     }
 
+    // Обработка касания друга от сервера
+socket.on('friendTouch', () => {
+  friendTouches++;
+  updateCounter();
+});
+    
     // Обновить модалку прогресса
     function updateProgressModal() {
       progressMy.textContent = myTouches;
@@ -318,6 +329,7 @@
       createHeart(e.clientX, e.clientY);
 
       myTouches++;
+      socket.emit('touch', { from: 'me' });
       updateCounter();
 
       // Проверяем 100, 200, 300 ... кроме 1000
