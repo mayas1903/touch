@@ -176,8 +176,9 @@
     const ctx = confettiCanvas.getContext('2d');
 const socket = io('https://immense-fantasy-turret.glitch.me');
 
-// Здесь получаем chat.id из Telegram WebApp
-const roomId = window.Telegram.WebApp.initDataUnsafe.chat.id;
+const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe)
+  ? window.Telegram.WebApp.initDataUnsafe.chat.id
+  : 'default_room'; 
 
 // Сообщаем серверу, в какую комнату мы заходим
 socket.emit('joinRoom', roomId);
