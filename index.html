@@ -265,21 +265,17 @@ socket.on('connect', () => {
     closeMotivationBtn.onclick = () => closeModal(motivationModal);
     closeGiftBtn.onclick = () => closeModal(giftModal);
 
-    // Закрытие по клику вне модалки
-    window.addEventListener('click', (e) => {
-      if (e.target === progressModal) closeModal(progressModal);
-      if (e.target === motivationModal) closeModal(motivationModal);
-      if (e.target === giftModal) closeModal(giftModal);
-    });
+   window.addEventListener('click', (e) => {
+  if (e.target === progressModal) closeModal(progressModal);
+  // Убрал закрытие мотивации и подарка по клику вне
+});
 
-    // Закрытие по ESC
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeModal(progressModal);
-        closeModal(motivationModal);
-        closeModal(giftModal);
-      }
-    });
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal(progressModal);
+    // Не закрываем мотивацию и подарок по ESC
+  }
+});
 
     // Обновление счётчика на экране
     function updateCounter() {
@@ -292,7 +288,17 @@ socket.on('friendTouch', ({ x, y }) => {
   createHeart(x, y);  // рисуем сердечко там, где кликнул друг
   updateCounter();
 });
+    socket.on('showMotivation', ({ total }) => {
+  const left = 1000 - total;
+  motivationLeft.textContent = left > 0 ? left : 0;
+  openModal(motivationModal);
+  startConfetti();
+});
 
+socket.on('showGift', () => {
+  openModal(giftModal);
+  startConfetti();
+});
     
     // Обновить модалку прогресса
     function updateProgressModal() {
@@ -331,26 +337,20 @@ socket.on('friendTouch', ({ x, y }) => {
 
     // Логика при клике по экрану (кроме счётчика)
     document.body.addEventListener('click', (e) => {
-      // Игнорируем если клик по счётчику (там отдельный обработчик)
-      if (e.target === counter) return;
-
-      // Создаём сердечко там где клик
-      createHeart(e.clientX, e.clientY);
-
-      myTouches++;
-      socket.emit('touch', { roomId, x: e.clientX, y: e.clientY }); 
-      // Передаём roomId и координаты
+  if (e.target === counter) return;
+  createHeart(e.clientX, e.clientY);
+  myTouches++;
+  socket.emit('touch', { roomId, x: e.clientX, y: e.clientY }); 
   updateCounter();
+  const total = myTouches + friendTouches;
+  if (total % 100 === 0 && total !== 1000) {
+    socket.emit('showMotivation', { roomId, total }); // Вместо локального showMotivation
+  }
+  if (total === 1000) {
+    socket.emit('showGift', { roomId }); // Вместо локального showGift
+  }
+});
 
-      // Проверяем 100, 200, 300 ... кроме 1000
-      const total = myTouches + friendTouches;
-      if (total % 100 === 0 && total !== 1000) {
-        showMotivation();
-      }
-      if (total === 1000) {
-        showGift();
-      }
-    });
 
     // При нажатии на счётчик показываем прогресс
     counter.addEventListener('click', () => {
