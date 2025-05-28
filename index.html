@@ -85,8 +85,8 @@
   /* Сердечки */
   .heart {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 70px;
+    height: 70px;
     pointer-events: none;
     background: url('data:image/svg+xml;utf8,<svg fill="%23d6336c" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3 9.24 3 10.91 3.81 12 5.09 13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') no-repeat center center;
     background-size: contain;
@@ -301,8 +301,8 @@
     function createHeart(x, y) {
       const heart = document.createElement('div');
       heart.className = 'heart';
-      heart.style.left = (x - 15) + 'px';
-      heart.style.top = (y - 15) + 'px';
+      heart.style.left = (x - 35) + 'px';
+      heart.style.top = (y - 35) + 'px';
       document.body.appendChild(heart);
       setTimeout(() => {
         heart.remove();
