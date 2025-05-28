@@ -362,6 +362,7 @@ socket.on('showGift', () => {
   const total = myTouches + friendTouches;
   if (total === 1000) {
     socket.emit('showGift', { roomId });
+      showGift();
   }
 });
     // При нажатии на счётчик показываем прогресс
