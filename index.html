@@ -2,114 +2,261 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=390, height=844, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Touch Me Softly</title>
   <style>
-    /* Базовые стили под iPhone 13/14 */
-    html, body {
-      margin: 0; padding: 0;
-      width: 390px; 
-      height: 844px;
-      overflow: hidden;
-      background: linear-gradient(to bottom, #fff0f5, #ffe6f0);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: #fff0f6;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      user-select: none;
+      overflow: hidden;
     }
 
     .counter {
-      position: fixed;
-      top: 20px; left: 20px; right: 20px;
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 18px;
+      padding: 12px 20px;
+      background: #ffe6f0;
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(255, 182, 193, 0.6);
       color: #d6336c;
-      background: rgba(255 255 255 / 0.9);
-      padding: 10px 20px;
-      border-radius: 25px;
-      text-align: center;
-      box-shadow: 0 3px 8px rgba(214,51,108,0.3);
       cursor: pointer;
       user-select: none;
-      z-index: 100;
+      transition: background 0.3s ease;
+      z-index: 10;
+      position: relative;
+    }
+
+    .counter:hover {
+      background: #ffccdd;
     }
 
     .modal {
       position: fixed;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
-      border-radius: 18px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-      width: 320px;
+      background: #fff;
+      border-radius: 20px;
+      width: 270px;
       max-width: 90vw;
-      padding: 25px 30px;
+      padding: 18px 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      font-size: 15px;
+      color: #000;
       text-align: center;
-      z-index: 200;
-      font-size: 17px;
-      color: #222;
       user-select: none;
+      box-sizing: border-box;
+      word-wrap: break-word;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-in-out;
     }
 
-    .modal.hidden {
-      display: none;
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .modal-content button {
-      margin-top: 20px;
-      padding: 10px 25px;
-      font-size: 16px;
-      font-weight: 600;
-      color: white;
+    .modal button {
+      margin-top: 15px;
       background: #d6336c;
       border: none;
-      border-radius: 25px;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 15px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background 0.3s ease;
     }
 
-    .modal-content button:hover {
-      background: #a02a58;
+    .modal button:hover {
+      background: #b02753;
     }
 
-    #fireworks {
+    #confetti-canvas {
       position: fixed;
-      top: 0; left: 0;
-      width: 390px;
-      height: 844px;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
-      z-index: 150;
-      user-select: none;
+      z-index: 2000;
     }
   </style>
-  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div class="counter" id="counter">Ты: 0 | Друг: 0</div>
+  <div class="counter" id="counter">Ты: 0 | Друг: 0</div>
 
-<div id="giftModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="giftTitle">
-  <div class="modal-content">
-    <h2 id="giftTitle">🎉 Поздравляем!</h2>
-    <p>Вы собрали <strong>1000 касаний 💖</strong></p>
+  <!-- Модалка подарка 1000 касаний -->
+  <div id="giftModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+    <h2 id="modalTitle">🎉 Поздравляем!</h2>
+    <p id="modalDesc">Вы собрали <strong>1000 касаний 💖</strong></p>
     <p>🎁 Подарок: Telegram Premium на 3 месяца</p>
-    <button onclick="closeModal()" aria-label="Закрыть окно с поздравлением">Закрыть</button>
+    <button id="closeGiftBtn">Закрыть</button>
   </div>
-</div>
 
-<div id="counterModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="progressTitle">
-  <div class="modal-content">
-    <h3 id="progressTitle">💖 Ваш прогресс</h3>
-    <p>Ты: <span id="modalMy">0</span></p>
-    <p>Друг: <span id="modalFriend">0</span></p>
-    <p>Всего: <span id="modalTotal">0</span></p>
-    <p>До подарка: <span id="modalLeft">1000</span></p>
-    <button onclick="closeCounterModal()" aria-label="Закрыть окно с прогрессом">Ок</button>
+  <!-- Мотивационная модалка при каждой сотне -->
+  <div id="motivationModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="motivationTitle" aria-describedby="motivationDesc">
+    <h3 id="motivationTitle">✨ Продолжайте в том же духе!</h3>
+    <p id="motivationDesc">Вам осталось накопить <span id="leftCount"></span> касаний</p>
+    <button id="closeMotivationBtn">Ок</button>
   </div>
-</div>
 
-<canvas id="fireworks" class="hidden"></canvas>
+  <canvas id="confetti-canvas"></canvas>
 
-<script src="script.js"></script>
+  <script>
+    const counter = document.getElementById('counter');
+    const giftModal = document.getElementById('giftModal');
+    const motivationModal = document.getElementById('motivationModal');
+    const leftCountSpan = document.getElementById('leftCount');
+    const closeGiftBtn = document.getElementById('closeGiftBtn');
+    const closeMotivationBtn = document.getElementById('closeMotivationBtn');
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const ctx = confettiCanvas.getContext('2d');
+
+    let myTouches = 0;
+    let friendTouches = 0; // Для простоты пока не используем
+    let totalTouches = 0;
+
+    // Устанавливаем размер canvas равным окну
+    function resizeCanvas() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Конфетти анимация
+    class ConfettiParticle {
+      constructor() {
+        this.x = Math.random() * confettiCanvas.width;
+        this.y = Math.random() * confettiCanvas.height - confettiCanvas.height;
+        this.size = (Math.random() * 6) + 4;
+        this.speed = (Math.random() * 3) + 2;
+        this.angle = Math.random() * 2 * Math.PI;
+        this.spin = (Math.random() * 0.1) + 0.01;
+        this.color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
+        this.opacity = 1;
+      }
+      update() {
+        this.y += this.speed;
+        this.x += Math.sin(this.angle) * 2;
+        this.angle += this.spin;
+        if (this.y > confettiCanvas.height) {
+          this.y = -10;
+          this.x = Math.random() * confettiCanvas.width;
+        }
+      }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.ellipse(this.x, this.y, this.size * 0.6, this.size, this.angle, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    }
+
+    let confettiParticles = [];
+
+    function startConfetti() {
+      confettiParticles = [];
+      for (let i = 0; i < 150; i++) {
+        confettiParticles.push(new ConfettiParticle());
+      }
+      confettiCanvas.style.display = 'block';
+      animateConfetti();
+      setTimeout(stopConfetti, 4000);
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiParticles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      if (confettiParticles.length > 0) {
+        requestAnimationFrame(animateConfetti);
+      }
+    }
+
+    function stopConfetti() {
+      confettiParticles = [];
+      confettiCanvas.style.display = 'none';
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    }
+
+    // Открыть и закрыть модалки
+    function openGiftModal() {
+      giftModal.classList.add('show');
+      startConfetti();
+    }
+
+    function closeGiftModal() {
+      giftModal.classList.remove('show');
+      stopConfetti();
+    }
+
+    function openMotivationModal(remaining) {
+      leftCountSpan.textContent = remaining;
+      motivationModal.classList.add('show');
+      startConfetti();
+    }
+
+    function closeMotivationModal() {
+      motivationModal.classList.remove('show');
+      stopConfetti();
+    }
+
+    closeGiftBtn.addEventListener('click', closeGiftModal);
+    closeMotivationBtn.addEventListener('click', closeMotivationModal);
+
+    // Закрытие модалок по клику вне окна
+    window.addEventListener('click', (e) => {
+      if (e.target === giftModal) closeGiftModal();
+      if (e.target === motivationModal) closeMotivationModal();
+    });
+
+    // Закрытие по ESC
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (giftModal.classList.contains('show')) closeGiftModal();
+        if (motivationModal.classList.contains('show')) closeMotivationModal();
+      }
+    });
+
+    // Обработка кликов по счетчику
+    counter.addEventListener('click', () => {
+      openMotivationModal(1000 - totalTouches);
+    });
+
+    // Обработка касаний по всему экрану
+    window.addEventListener('click', () => {
+      myTouches++;
+      totalTouches = myTouches + friendTouches;
+
+      counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+
+      // Каждые 100 касаний (кроме 1000)
+      if (totalTouches > 0 && totalTouches % 100 === 0 && totalTouches < 1000) {
+        openMotivationModal(1000 - totalTouches);
+      }
+
+      // При 1000 касаний
+      if (totalTouches >= 1000) {
+        openGiftModal();
+      }
+    });
+
+  </script>
+
 </body>
 </html>
