@@ -163,7 +163,6 @@
     // Элементы
     const counter = document.getElementById('counter');
     const progressModal = document.getElementById('progressModal');
-    const motivationModal = document.getElementById('motivationModal');
     const giftModal = document.getElementById('giftModal');
 
     const progressMy = document.getElementById('progressMy');
@@ -171,10 +170,7 @@
     const progressTotal = document.getElementById('progressTotal');
     const progressLeft = document.getElementById('progressLeft');
 
-    const motivationLeft = document.getElementById('motivationLeft');
-
     const closeProgressBtn = document.getElementById('closeProgressBtn');
-    const closeMotivationBtn = document.getElementById('closeMotivationBtn');
     const closeGiftBtn = document.getElementById('closeGiftBtn');
 
     const confettiCanvas = document.getElementById('confetti-canvas');
@@ -267,7 +263,6 @@ socket.on('connect', () => {
 
     // Закрытия по кнопкам
     closeProgressBtn.onclick = () => closeModal(progressModal);
-    closeMotivationBtn.onclick = () => closeModal(motivationModal);
     closeGiftBtn.onclick = () => closeModal(giftModal);
 
    window.addEventListener('click', (e) => {
@@ -292,13 +287,6 @@ socket.on('friendTouch', ({ x, y }) => {
   friendTouches++;
   createEmoji(x, y, '💋');  // Здесь ставим смайлик огонь для друга
   updateCounter();
-});
-
-    socket.on('showMotivation', ({ total }) => {
-  const left = 1000 - total;
-  motivationLeft.textContent = left > 0 ? left : 0;
-  openModal(motivationModal);
-  startConfetti();
 });
 
 socket.on('showGift', () => {
@@ -339,7 +327,6 @@ socket.on('showGift', () => {
   if (e.target === counter) return;
        if (
     progressModal.classList.contains('show') ||
-    motivationModal.classList.contains('show') ||
     giftModal.classList.contains('show')
   ) {
     return; 
