@@ -375,7 +375,6 @@ function handleTouch(x, y) {
   checkReward();
 }
 
-
     // Ловим touchstart и click (для десктопа)
     document.body.addEventListener('touchstart', e => {
       if (e.target === counter) return;
@@ -390,12 +389,13 @@ function handleTouch(x, y) {
 
     // Обработка данных от друга
     socket.on('friendTouch', ({ x, y }) => {
-      friendTouches++;
-      createRandomEmoji(x, y, '💗');
-      updateCounter();
-      updateProgressModal();
-      checkReward();
-    });
+  friendTouches++;
+  createEmoji(x, y, '💗');
+  animateNumber(counter, lastMyTouches, myTouches);
+  lastFriendTouches = friendTouches;
+  updateProgressModal();
+  checkReward();
+});
 
     // Анимация конфетти
     const confettiCanvas = document.getElementById('confetti-canvas');
@@ -456,13 +456,13 @@ function handleTouch(x, y) {
 
     // Запускаем конфетти, когда подарок открыт
     function startConfetti() {
-      createConfetti(150);
+      createConfetti(450);
       confettiCanvas.style.display = 'block';
       animateConfetti();
       setTimeout(() => {
         confettiCanvas.style.display = 'none';
         confettiParticles = [];
-      }, 7000);
+      }, 3000);
     }
 
     // При открытии подарка запускаем конфетти
