@@ -315,7 +315,7 @@ let rewardClaimed = false;
 
 function checkReward() {
   totalTouches = myTouches + friendTouches;
-  if (totalTouches >= 1000 && !rewardAvailableModal.classList.contains('show') && !rewardClaimed) {
+  if (totalTouches >= 10 && !rewardAvailableModal.classList.contains('show') && !rewardClaimed) {
     openModal(rewardAvailableModal);
   }
 }
