@@ -397,12 +397,6 @@ socket.emit('joinRoom', roomId);
 socket.on('connect', () => {
   console.log('🧠 Подключились к WebSocket-серверу');
 });
-    socket.on('emojiSelected', ({ x, y }) => {
-  friendTouches++;
-  updateCounter();
-  createRandomEmoji(x, y, friendSelectedEmoji);
-  checkReward();
-});
 
     // Отправка касания на сервер
    function sendTouch(x, y) {
@@ -416,12 +410,12 @@ function handleTouch(x, y) {
    if (touchCooldown || isModalOpen) return;
   touchCooldown = true;
   setTimeout(() => (touchCooldown = false), 100); // Задержка между касаниями
-  myTouches++;
+  socket.on('emojiSelected', ({ x, y }) => {
+  friendTouches++;
   updateCounter();
-  createRandomEmoji(x, y);
-  sendTouch(x, y);
+  createRandomEmoji(x, y, friendSelectedEmoji);
   checkReward();
-}
+});
 
     // Ловим touchstart и click (для десктопа)
     let ignoreClick = false;
