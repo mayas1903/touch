@@ -382,16 +382,24 @@ function handleTouch(x, y) {
 }
 
     // Ловим touchstart и click (для десктопа)
-    document.body.addEventListener('touchstart', e => {
-      if (e.target === counter) return;
-      const touch = e.touches[0];
-      handleTouch(touch.clientX, touch.clientY);
-    });
+    let ignoreClick = false;
 
-    document.body.addEventListener('click', e => {
-      if (e.target === counter) return;
-      handleTouch(e.clientX, e.clientY);
-    });
+document.body.addEventListener('touchstart', e => {
+  if (e.target === counter) return;
+  const touch = e.touches[0];
+  handleTouch(touch.clientX, touch.clientY);
+  ignoreClick = true;
+  setTimeout(() => {
+    ignoreClick = false;
+  }, 500); // 500 мс — достаточно, чтобы игнорировать клик после касания
+});
+
+document.body.addEventListener('click', e => {
+  if (e.target === counter) return;
+  if (ignoreClick) return; // игнорируем клик, если он идет сразу после касания
+  handleTouch(e.clientX, e.clientY);
+});
+
 
     // Обработка данных от друга
    socket.on('friendTouch', ({ x, y }) => {
