@@ -194,8 +194,6 @@
   <p id="rewardResultText">Вам выпал Telegram Premium на 3 месяца!</p>
   <button id="closeRewardBtn">Активировать</button>
 </div>
-
-  <canvas id="confetti-canvas"></canvas>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     // Переменные счётчиков
@@ -278,7 +276,6 @@ socket.on('connect', () => {
     ctx.fill();
     ctx.globalAlpha = 1;
   }
-}
   isVisible() {
     return this.opacity > 0;
   }
