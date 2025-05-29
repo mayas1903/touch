@@ -575,41 +575,34 @@ document.body.addEventListener('pointerdown', e => {
 });
 
  function startSakuraRain() {
+   console.log('🌸 startSakuraRain запущен');
   const petals = [];
   const NUM_PETALS = 40;
-
   for (let i = 0; i < NUM_PETALS; i++) {
     const petal = document.createElement('div');
     petal.innerHTML = '<img src="https://i.postimg.cc/hGx3qH3k/Chat-GPT-Image-30-2025-08-09-10.png" alt="petal" />';
     const img = petal.querySelector('img');
-
     const size = 20 + Math.random() * 20;
     const startX = Math.random() * window.innerWidth;
     const driftX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 30);
     const startY = -50 - Math.random() * 50;
-
     petal.style.position = 'fixed';
     petal.style.left = `${startX}px`;
     petal.style.top = `${startY}px`;
     petal.style.pointerEvents = 'none';
     petal.style.zIndex = 9999;
-    
     img.style.width = `${size}px`;
     img.style.height = 'auto';
     img.style.opacity = '0';
     img.style.transition = 'opacity 1s ease';
-    
     // Добавляем покачивание
     img.style.animation = `sway ${3 + Math.random()}s ease-in-out infinite`;
-
     document.body.appendChild(petal);
     petals.push(petal);
-
     // Плавное появление
     setTimeout(() => {
       img.style.opacity = '1';
     }, 10);
-
     // Анимация падения (движение по траектории)
     const duration = 4000;
     petal.animate([
