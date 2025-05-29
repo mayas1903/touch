@@ -440,7 +440,8 @@ document.body.addEventListener('pointerdown', e => {
 
 
     // Обработка данных от друга
-   socket.on('friendTouch', ({ x, y }) => {
+   socket.on('emojiSelected', ({ emoji }) => {
+  friendSelectedEmoji = emoji;
   friendTouches++;
   createRandomEmoji(x, y, friendSelectedEmoji);
  updateCounter();
