@@ -208,7 +208,7 @@
   </svg>
 </div>
   
-  <div id="emojiSelector" style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+  <div id="emojiSelector" style="margin-top: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
   <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">❤️</span>
   <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🌸</span>
   <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">✨</span>
@@ -419,7 +419,9 @@ document.body.addEventListener('touchstart', e => {
 });
 
 document.body.addEventListener('pointerdown', e => {
-  handleTouch(e.clientX, e.clientY, e.target);
+  const target = e.target;
+  if (target.closest('#counter') || target.closest('#emojiSelector')) return;
+  handleTouch(e.clientX, e.clientY, target);
 });
 
     // Обработка данных от друга
