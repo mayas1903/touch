@@ -285,8 +285,10 @@
       }
       requestAnimationFrame(update);
     }
+const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
 
     function createRandomEmoji(x, y, emoji) {
+      const fallbackEmojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
   const chosenEmoji = emoji || emojis[Math.floor(Math.random() * emojis.length)];
   const span = document.createElement('span');
   span.className = 'heart';
