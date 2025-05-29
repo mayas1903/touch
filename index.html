@@ -291,14 +291,13 @@
       counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
     }
 
-    function updateProgressModal() {
-      progressMy.textContent = myTouches;
-      progressFriend.textContent = friendTouches;
-      totalTouches = myTouches + friendTouches;
-      progressTotal.textContent = totalTouches;
-      progressLeft.textContent = Math.max(1000 - totalTouches, 0);
-    }
-
+    ffunction updateProgressModal() {
+  progressMy.textContent = myTouches;
+  progressFriend.textContent = friendTouches;
+  totalTouches = myTouches + friendTouches;
+  progressTotal.textContent = totalTouches;
+  progressLeft.textContent = Math.max(1000 - totalTouches, 0);
+}
     function openModal(modal) {
       isModalOpen = true;
       modal.classList.add('show');
