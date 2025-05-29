@@ -303,14 +303,6 @@
   <script>
     let myTouches = 0;
     let selectedEmoji = '❤️';
-    document.querySelectorAll('.emojiChoice').forEach(el => {
-  el.addEventListener('click', () => {
-    selectedEmoji = el.textContent;
-    document.querySelectorAll('.emojiChoice').forEach(e => e.style.opacity = '0.5');
-    el.style.opacity = '1';
-  });
-});
-document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
     
     let friendTouches = 0;
     let totalTouches = 0;
@@ -501,7 +493,15 @@ const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.Web
   : 'default_room';
 socket.emit('joinRoom', roomId);
 socket.on('connect', () => {
-  console.log('🧠 Подключились к WebSocket-серверу');
+  document.querySelectorAll('.emojiChoice').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedEmoji = el.textContent;
+      document.querySelectorAll('.emojiChoice').forEach(e => e.style.opacity = '0.5');
+      el.style.opacity = '1';
+    });
+  });
+  document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
+console.log('🧠 Подключились к WebSocket-серверу');
 });
 
     // Отправка касания на сервер
@@ -515,6 +515,13 @@ socket.on('connect', () => {
     
 function handleTouch(x, y, target = null) {
   if (touchCooldown || isModalOpen) return;
+  if (target && (
+    target.closest('#emojiSelector') ||
+    target.classList.contains('emojiChoice') ||
+    target.closest('.modal') ||
+    target.closest('.gift-box') ||
+    target.closest('button')
+  )) return;
   if (target && (target.closest('#emojiSelector') || target.classList.contains('emojiChoice'))) return;
   touchCooldown = true;
   setTimeout(() => (touchCooldown = false), 100);
@@ -680,7 +687,6 @@ function startConfetti() {
   requestAnimationFrame(fadeOut);
 }
 
-
 window.addEventListener('resize', () => {
   W = window.innerWidth;
   H = window.innerHeight;
@@ -700,41 +706,7 @@ document.addEventListener('click', (e) => {
   ) return;
   handleTouch(e.clientX, e.clientY, target);
 });
-
-// Отслеживаем "потерю фокуса" окна — возможный скриншот
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") {
-    setTimeout(() => {
-      // Когда пользователь возвращается в окно после потери фокуса
-      if (document.visibilityState === "visible") {
-        showScreenshotMessage();
-      }
-    }, 500); // Подожди чуть-чуть, чтобы "скриншот" успел произойти
-  }
-});
-
-// Показываем милое сообщение
-function showScreenshotMessage() {
-  const div = document.createElement("div");
-  div.innerText = "Хочешь сохранить этот момент? 💖";
-  div.style.position = "fixed";
-  div.style.bottom = "20px";
-  div.style.left = "50%";
-  div.style.transform = "translateX(-50%)";
-  div.style.padding = "12px 20px";
-  div.style.background = "#ffe4e1";
-  div.style.border = "2px solid #ff69b4";
-  div.style.borderRadius = "16px";
-  div.style.fontSize = "16px";
-  div.style.boxShadow = "0 2px 10px rgba(0,0,0,0.2)";
-  div.style.zIndex = 9999;
-  document.body.appendChild(div);
-
-  setTimeout(() => {
-    div.remove();
-  }, 4000); // убираем сообщение через 4 секунды
-}
-
+    
   </script>
 </body>
 </html>
