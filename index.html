@@ -471,25 +471,30 @@ document.body.addEventListener('pointerdown', e => {
       }
     }
 
-    function animateConfetti() {
-      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      confettiParticles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animateConfetti);
-    }
+   let confettiAnimating = false;
 
-    // Запускаем конфетти, когда подарок открыт
-    function startConfetti() {
-      createConfetti(500);
-      confettiCanvas.style.display = 'block';
-      animateConfetti();
-      setTimeout(() => {
-        confettiCanvas.style.display = 'none';
-        confettiParticles = [];
-      }, 3000);
-    }
+function animateConfetti() {
+  if (!confettiAnimating) return; // прекращаем анимацию, если флаг снят
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiParticles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateConfetti);
+}
+
+function startConfetti() {
+  confettiAnimating = true;
+  createConfetti(500);
+  confettiCanvas.style.display = 'block';
+  animateConfetti();
+  setTimeout(() => {
+    confettiAnimating = false;
+    confettiCanvas.style.display = 'none';
+    confettiParticles = [];
+  }, 3000);
+}
+
   </script>
 </body>
 </html>
