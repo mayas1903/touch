@@ -167,6 +167,25 @@
 </head>
 <body>
 
+  <!-- Кнопка для создания записки -->
+<button id="noteButton" style="margin-top: 10px; padding: 10px 20px; border-radius: 12px; background: #ff69b4; color: white; border: none; font-size: 16px; cursor: pointer;">💌 Написать записку</button>
+
+<!-- Модальное окно записи -->
+<div id="noteModal" class="modal">
+  <h3>Оставить записку</h3>
+  <textarea id="noteText" maxlength="140" rows="4" placeholder="Введите записку..." style="width: 100%; border-radius: 8px; padding: 8px;"></textarea>
+  <p style="margin-top: 10px;">Показать, когда достигнуто:</p>
+  <input id="noteThreshold" type="number" min="1" max="10000" value="50" style="width: 100%; padding: 8px; border-radius: 8px;" />
+  <button id="saveNoteBtn">Сохранить</button>
+</div>
+
+<!-- Модальное окно показа записки -->
+<div id="noteRevealModal" class="modal">
+  <h3>📩 Сообщение</h3>
+  <p id="revealedNoteText"></p>
+  <button onclick="closeModal(noteRevealModal)">Ок</button>
+</div>
+
   <canvas id="confetti-canvas"></canvas>
   <p id="description" style="
     font-size: 15px;
@@ -271,6 +290,34 @@
     let lastFriendTouches = 0;
     let rewardClaimed = false;
 
+    let savedNote = null;
+let noteThreshold = 0;
+let noteShown = false;
+    const noteModal = document.getElementById('noteModal');
+const noteButton = document.getElementById('noteButton');
+const saveNoteBtn = document.getElementById('saveNoteBtn');
+const noteText = document.getElementById('noteText');
+const noteThresholdInput = document.getElementById('noteThreshold');
+const noteRevealModal = document.getElementById('noteRevealModal');
+const revealedNoteText = document.getElementById('revealedNoteText');
+
+// Открытие модального окна записки
+noteButton.onclick = () => {
+  openModal(noteModal);
+};
+
+// Сохраняем записку и порог
+saveNoteBtn.onclick = () => {
+  const text = noteText.value.trim();
+  const threshold = parseInt(noteThresholdInput.value, 10);
+  if (text && threshold > 0) {
+    savedNote = text;
+    noteThreshold = threshold;
+    closeModal(noteModal);
+    alert(`✉️ Записка сохранена. Покажется при ${threshold} касаниях.`);
+  }
+};
+
     function animateNumber(element, start, end, duration = 300) {
       const startTime = performance.now();
 
@@ -325,8 +372,13 @@ const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
       if (totalTouches >= 10 && !rewardAvailableModal.classList.contains('show') && !rewardClaimed) {
         openModal(rewardAvailableModal);
       }
-    }
-
+      if (savedNote && totalTouches >= noteThreshold && !noteShown) {
+    revealedNoteText.textContent = savedNote;
+    openModal(noteRevealModal);
+    noteShown = true;
+  }
+  }
+      
     closeProgressBtn.onclick = () => closeModal(progressModal);
     openRewardBtn.onclick = () => {
       closeModal(rewardAvailableModal);
