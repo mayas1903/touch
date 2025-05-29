@@ -339,6 +339,7 @@
       const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
       document.getElementById('rewardResultText').innerHTML = `Вам выпал:<br><strong>${randomGift}</strong>`;
       openModal(rewardResultModal);
+      startConfetti();
     }
 
     closeRewardBtn.onclick = () => {
@@ -489,11 +490,6 @@ document.body.addEventListener('pointerdown', e => {
         confettiParticles = [];
       }, 3000);
     }
-
-    // При открытии подарка запускаем конфетти
-    openRewardBtn.addEventListener('click', () => {
-      startConfetti();
-    });
   </script>
 </body>
 </html>
