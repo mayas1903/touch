@@ -415,87 +415,91 @@ document.body.addEventListener('pointerdown', e => {
 });
 
     // Анимация конфетти
-    const confettiCanvas = document.getElementById('confetti-canvas');
-    const ctx = confettiCanvas.getContext('2d');
-    let confettiParticles = [];
+    const confettiCanvas = document.createElement('canvas');
+const ctx = confettiCanvas.getContext('2d');
+document.body.appendChild(confettiCanvas);
 
-    function resizeCanvas() {
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-    }
+let W = window.innerWidth;
+let H = window.innerHeight;
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+confettiCanvas.width = W;
+confettiCanvas.height = H;
+confettiCanvas.style.position = 'fixed';
+confettiCanvas.style.top = '0';
+confettiCanvas.style.left = '0';
+confettiCanvas.style.pointerEvents = 'none';
+confettiCanvas.style.zIndex = '9999';
 
-   class ConfettiParticle {
+class Confetti {
   constructor() {
-    this.x = window.innerWidth / 2;
-    this.y = window.innerHeight / 2;
-    const angle = Math.random() * 2 * Math.PI;
-    const speed = 5 + Math.random() * 10; // мощный выстрел
-    this.vx = Math.cos(angle) * speed;
-    this.vy = Math.sin(angle) * speed;
-    this.size = 6 + Math.random() * 8; // крупнее
-    this.color = `hsl(${Math.floor(Math.random() * 360)}, 90%, 60%)`; // яркие цвета
-    this.gravity = 0.15;
+    this.x = Math.random() * W;
+    this.y = Math.random() * H - H; // старт с верхней границы и выше
+    this.size = 5 + Math.random() * 10;
+    this.color = `hsl(${Math.floor(Math.random() * 360)}, 80%, 60%)`;
+    this.speedY = 2 + Math.random() * 5;
+    this.speedX = (Math.random() - 0.5) * 2;
     this.opacity = 1;
-    this.friction = 0.95; // замедление полёта
     this.rotation = Math.random() * 360;
     this.rotationSpeed = (Math.random() - 0.5) * 10;
   }
 
   update() {
-    this.vx *= this.friction;
-    this.vy *= this.friction;
-    this.vy += this.gravity; // падение вниз
-    this.x += this.vx;
-    this.y += this.vy;
-    this.opacity -= 0.02; // постепенно исчезают
+    this.y += this.speedY;
+    this.x += this.speedX;
     this.rotation += this.rotationSpeed;
+    if (this.y > H) {
+      this.y = -this.size;
+      this.x = Math.random() * W;
+    }
+    if (this.x > W) this.x = 0;
+    if (this.x < 0) this.x = W;
   }
 
   draw(ctx) {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation * Math.PI / 180);
-    ctx.globalAlpha = Math.max(this.opacity, 0);
     ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.opacity;
     ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 3);
     ctx.restore();
   }
 }
 
-function createConfetti(count) {
-  confettiParticles = [];
-  for (let i = 0; i < count; i++) {
-    confettiParticles.push(new ConfettiParticle());
+let confettiPieces = [];
+const CONFETTI_COUNT = 300;
+
+function initConfetti() {
+  confettiPieces = [];
+  for (let i = 0; i < CONFETTI_COUNT; i++) {
+    confettiPieces.push(new Confetti());
   }
 }
 
-function animateConfetti() {
-  if (!confettiAnimating) return;
-  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-  confettiParticles.forEach((p, i) => {
-    p.update();
-    p.draw(ctx);
-    if (p.opacity <= 0) {
-      confettiParticles.splice(i, 1);
-    }
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  confettiPieces.forEach(c => {
+    c.update();
+    c.draw(ctx);
   });
-  if (confettiParticles.length > 0) {
-    requestAnimationFrame(animateConfetti);
-  } else {
-    confettiAnimating = false;
-    confettiCanvas.style.display = 'none';
-  }
+  requestAnimationFrame(render);
 }
 
 function startConfetti() {
-  confettiAnimating = true;
-  createConfetti(150); // много ярких частиц
   confettiCanvas.style.display = 'block';
-  animateConfetti();
+  initConfetti();
+  render();
 }
+
+window.addEventListener('resize', () => {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  confettiCanvas.width = W;
+  confettiCanvas.height = H;
+});
+
+// Запускай как вызов:
+startConfetti();
 
   </script>
 </body>
