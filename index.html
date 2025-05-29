@@ -158,22 +158,24 @@
   </div>
 
   <!-- Модалка подарка при 1000 -->
-<div id="giftModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="giftTitle" aria-describedby="giftDesc">
-  <div class="gift-animation">
-    <div class="gift-box">
-      <div class="lid"></div>
-      <div class="box"></div>
-      <div class="ribbon"></div>
-    </div>
-  </div>
-  <h2 id="giftTitle">🎉 Поздравляем!</h2>
-  <p id="giftDesc">Вы собрали <strong>1000 касаний 💖</strong></p>
-  <p>🎁 Подарок: Telegram Premium на 3 месяца</p>
-  <button id="claimGiftBtn">Получить</button>
-  <div id="loadingIndicator" style="display:none; margin-top: 15px;">
-  🔄 Активация...
+<!-- Первая модалка: Подарок доступен -->
+<div id="rewardAvailableModal" class="modal">
+  <h2>🎉 Поздравляем!</h2>
+  <p>Вы собрали <strong>1000 касаний</strong><br>Вам доступен подарок!</p>
+  <button id="openRewardBtn">Получить</button>
 </div>
-  <button id="closeGiftBtn">Закрыть</button>
+
+<!-- Анимация загрузки -->
+<div id="rewardLoadingModal" class="modal">
+  <h2>🎁 Открываем подарок...</h2>
+  <div style="margin-top: 20px; font-size: 24px;">⏳</div>
+</div>
+
+<!-- Финальная модалка: Подарок получен -->
+<div id="rewardResultModal" class="modal">
+  <h2>Ура! 🎉</h2>
+  <p id="rewardResultText">Вам выпал Telegram Premium на 3 месяца!</p>
+  <button id="closeRewardBtn">Закрыть</button>
 </div>
 
   <canvas id="confetti-canvas"></canvas>
