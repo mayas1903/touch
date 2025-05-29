@@ -393,11 +393,11 @@ const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес т�
 const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe)
   ? window.Telegram.WebApp.initDataUnsafe.chat.id
   : 'default_room';
-socket.emit('joinRoom', roomId);
 socket.on('connect', () => {
   console.log('🧠 Подключились к WebSocket-серверу');
+  socket.emit('joinRoom', roomId);
 });
-    socket.on('emojiSelected', ({ x, y }) => {
+    socket.on('emojiSelected', ({ emoji }) => {
   friendTouches++;
   updateCounter();
   createRandomEmoji(x, y, friendSelectedEmoji);
