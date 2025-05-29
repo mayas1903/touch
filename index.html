@@ -282,14 +282,16 @@ socket.on('connect', () => {
 }
     let confettiParticles = [];
 
-function startConfetti() {
+ function startConfetti() {
   confettiParticles = [];
-  for (let i = 0; i < 400; i++) { // раньше было 150
+  for (let i = 0; i < 400; i++) {
     confettiParticles.push(new ConfettiParticle());
   }
-  confettiCanvas.style.display = 'block';
+  confettiCanvas.classList.add('active');
   animateConfetti();
-  setTimeout(stopConfetti, 6000); // плавнее завершение
+  setTimeout(() => {
+    // Не прячем сразу, пусть анимация завершится сама
+  }, 6000);
 }
 
     function animateConfetti() {
@@ -298,19 +300,27 @@ function startConfetti() {
     p.update();
     p.draw();
   });
+  // Оставляем только видимые частицы
   confettiParticles = confettiParticles.filter(p => p.isVisible());
   if (confettiParticles.length > 0) {
     requestAnimationFrame(animateConfetti);
   } else {
-    stopConfetti();
+    // Проверяем, нет ли частиц с opacity > 0
+    const stillVisible = confettiParticles.some(p => p.opacity > 0);
+    if (stillVisible) {
+      requestAnimationFrame(animateConfetti);
+    } else {
+      stopConfetti();
+    }
   }
 }
-
-    function stopConfetti() {
-      confettiParticles = [];
-      confettiCanvas.style.display = 'none';
-      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    }
+function stopConfetti() {
+  confettiParticles = [];
+  confettiCanvas.classList.remove('active');
+  setTimeout(() => {
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  }, 500); // подождать пока opacity станет 0
+}
 
     // Функции открытия/закрытия модалок
     function openModal(modal) {
@@ -324,7 +334,9 @@ function startConfetti() {
 closeProgressBtn.onclick = () => closeModal(progressModal);
 closeRewardBtn.onclick = () => {
   closeModal(rewardResultModal);
-  alert("Подарок активирован! 🎁");
+ setTimeout(() => {
+    alert("Подарок активирован! 🎁");
+  }, 1000); // 1000 мс = 1 секунда
 };
 
 let rewardClaimed = false;
@@ -424,7 +436,6 @@ document.body.addEventListener('click', (e) => {
   myTouches++;
   socket.emit('touch', { roomId, x: e.clientX, y: e.clientY });
   updateCounter();
-  animateCounter();
   checkReward();
 
   if (navigator.vibrate) navigator.vibrate(50);
