@@ -204,17 +204,20 @@
 
     // Элементы
     const counter = document.getElementById('counter');
-   const rewardAvailableModal = document.getElementById('rewardAvailableModal');
+const progressModal = document.getElementById('progressModal');
+
+const rewardAvailableModal = document.getElementById('rewardAvailableModal');
 const rewardLoadingModal = document.getElementById('rewardLoadingModal');
 const rewardResultModal = document.getElementById('rewardResultModal');
 
-    const progressMy = document.getElementById('progressMy');
-    const progressFriend = document.getElementById('progressFriend');
-    const progressTotal = document.getElementById('progressTotal');
-    const progressLeft = document.getElementById('progressLeft');
+const progressMy = document.getElementById('progressMy');
+const progressFriend = document.getElementById('progressFriend');
+const progressTotal = document.getElementById('progressTotal');
+const progressLeft = document.getElementById('progressLeft');
 
-    const closeProgressBtn = document.getElementById('closeProgressBtn');
-    const closeGiftBtn = document.getElementById('closeGiftBtn');
+const closeProgressBtn = document.getElementById('closeProgressBtn');
+const openRewardBtn = document.getElementById('openRewardBtn');
+const closeRewardBtn = document.getElementById('closeRewardBtn');
 
     const confettiCanvas = document.getElementById('confetti-canvas');
     const ctx = confettiCanvas.getContext('2d');
@@ -305,8 +308,41 @@ socket.on('connect', () => {
     }
 
     // Закрытия по кнопкам
-    closeProgressBtn.onclick = () => closeModal(progressModal);
-    closeGiftBtn.onclick = () => closeModal(giftModal);
+closeProgressBtn.onclick = () => closeModal(progressModal);
+closeRewardBtn.onclick = () => closeModal(rewardResultModal);
+
+let rewardClaimed = false;
+
+function checkReward() {
+  totalTouches = myTouches + friendTouches;
+  if (totalTouches >= 1000 && !rewardAvailableModal.classList.contains('show') && !rewardClaimed) {
+    openModal(rewardAvailableModal);
+  }
+}
+
+openRewardBtn.onclick = () => {
+  closeModal(rewardAvailableModal);
+  openModal(rewardLoadingModal);
+
+  setTimeout(() => {
+    closeModal(rewardLoadingModal);
+
+    const gifts = [
+      "Telegram Premium на 3 месяца!",
+      "Telegram Premium на 1 месяц!",
+      "Звезды 250 штук!",
+      "Звезды 500 штук",
+    ];
+    const gift = gifts[Math.floor(Math.random() * gifts.length)];
+
+    document.getElementById('rewardResultText').textContent = `Вам выпал ${gift}`;
+    openModal(rewardResultModal);
+
+    startConfetti();
+    rewardClaimed = true; // Подарок получен, больше не показываем
+  }, 2000);
+};
+
 
    window.addEventListener('click', (e) => {
   if (e.target === progressModal) closeModal(progressModal);
@@ -331,11 +367,6 @@ socket.on('friendTouch', ({ x, y }) => {
   createEmoji(x, y, '💗');  // Здесь ставим смайлик огонь для друга
   updateCounter();
 });
-
-socket.on('showGift', () => {
-  openModal(giftModal);
-  startConfetti();
-});
     
     // Обновить модалку прогресса
     function updateProgressModal() {
@@ -344,12 +375,6 @@ socket.on('showGift', () => {
       totalTouches = myTouches + friendTouches;
       progressTotal.textContent = totalTouches;
       progressLeft.textContent = Math.max(1000 - totalTouches, 0);
-    }
-
-    // Всплывашка подарка при 1000
-    function showGift() {
-      openModal(giftModal);
-      startConfetti();
     }
 
     // Создаём сердечко по касанию
@@ -364,44 +389,37 @@ socket.on('showGift', () => {
     elem.remove();
   }, 1200);
 }
-
-    // Логика при клике по экрану (кроме счётчика)
-   document.body.addEventListener('click', (e) => {
-  if (e.target === counter) return;
-    if (
-  progressModal.classList.contains('show') ||
-  rewardAvailableModal.classList.contains('show') ||
-  rewardLoadingModal.classList.contains('show') ||
-  rewardResultModal.classList.contains('show')
-) {
-  return; 
+function animateCounter() {
+  counter.style.transform = 'scale(1.2)';
+  setTimeout(() => {
+    counter.style.transform = 'scale(1)';
+  }, 150);
 }
-  createEmoji(e.clientX, e.clientY, '💗'); // Твой смайлик — сердечко
+
+document.body.addEventListener('click', (e) => {
+  if (e.target === counter) return;
+  if (
+    progressModal.classList.contains('show') ||
+    rewardAvailableModal.classList.contains('show') ||
+    rewardLoadingModal.classList.contains('show') ||
+    rewardResultModal.classList.contains('show')
+  ) return;
+
+  createEmoji(e.clientX, e.clientY, '💗');
   myTouches++;
   socket.emit('touch', { roomId, x: e.clientX, y: e.clientY });
   updateCounter();
+  animateCounter();
+  checkReward();
+
+  if (navigator.vibrate) navigator.vibrate(50);
 });
+
     // При нажатии на счётчик показываем прогресс
     counter.addEventListener('click', () => {
       updateProgressModal();
       openModal(progressModal);
     });
-
-    // Инициализация
-    updateCounter();
-    const claimGiftBtn = document.getElementById('claimGiftBtn');
-claimGiftBtn.onclick = () => {
-  const loading = document.getElementById('loadingIndicator');
-  claimGiftBtn.disabled = true; // Блокируем кнопку, чтобы не спамили
-  loading.style.display = 'flex'; // Показываем индикатор
-
-  setTimeout(() => {
-    loading.style.display = 'none'; // Скрываем индикатор
-    claimGiftBtn.disabled = false; // Разблокируем кнопку
-    alert('Подарок активирован! Спасибо, что играете 😊');
-    closeModal(giftModal);
-  }, 2000); // 2 секунды имитация загрузки
-};
 
   </script>
 </body>
