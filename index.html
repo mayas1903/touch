@@ -477,12 +477,35 @@ const counterHandler = () => {
   openModal(progressModal);
 };
 if (isTouchDevice()) {
-  counter.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    counterHandler();
+  document.body.addEventListener('touchend', (e) => {
+    // Игнорировать касания по интерактивным элементам
+    if (e.target.closest('button, .modal, #counter, .gift-box, textarea, input, #helpButton')) {
+      return;
+    }
+
+    const touch = e.changedTouches[0];
+    createRandomEmoji(touch.clientX, touch.clientY);
+
+    myTouches++;
+    updateCounter();
+    updateProgressModal();
+    checkReward();
+    socket.emit('touch', roomId);
   });
 } else {
-  counter.addEventListener('click', counterHandler);
+  document.body.addEventListener('click', (e) => {
+    // Игнорировать клики по интерактивным элементам
+    if (e.target.closest('button, .modal, #counter, .gift-box, textarea, input, #helpButton')) {
+      return;
+    }
+
+    createRandomEmoji(e.clientX, e.clientY);
+    myTouches++;
+    updateCounter();
+    updateProgressModal();
+    checkReward();
+    socket.emit('touch', roomId);
+  });
 }
 
     // Подключаем Socket.IO
@@ -711,6 +734,7 @@ document.addEventListener('click', (e) => {
     socket.emit('touch', { roomId });
   }
 });
+    
 // Отслеживаем "потерю фокуса" окна — возможный скриншот
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
