@@ -303,6 +303,15 @@
   <script>
     let myTouches = 0;
     let selectedEmoji = '❤️';
+    document.querySelectorAll('.emojiChoice').forEach(el => {
+  el.addEventListener('click', () => {
+    selectedEmoji = el.textContent;
+    document.querySelectorAll('.emojiChoice').forEach(e => e.style.opacity = '0.5');
+    el.style.opacity = '1';
+  });
+});
+document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
+    
     let friendTouches = 0;
     let totalTouches = 0;
 
@@ -492,16 +501,6 @@ const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.Web
   : 'default_room';
 socket.emit('joinRoom', roomId);
 socket.on('connect', () => {
-  // Обработка выбора эмодзи
-document.querySelectorAll('.emojiChoice').forEach(el => {
-  el.addEventListener('click', () => {
-    selectedEmoji = el.textContent;
-    document.querySelectorAll('.emojiChoice').forEach(e => e.style.opacity = '0.5');
-    el.style.opacity = '1';
-  });
-});
-// По умолчанию выделим первый
-document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
   console.log('🧠 Подключились к WebSocket-серверу');
 });
 
@@ -529,18 +528,16 @@ function handleTouch(x, y, target = null) {
     // Ловим touchstart и click (для десктопа)
     let ignoreClick = false;
 
-document.body.addEventListener('touchstart', e => {
-  const touch = e.touches[0];
-  handleTouch(touch.clientX, touch.clientY, e.target);
-  ignoreClick = true;
-  setTimeout(() => {
-    ignoreClick = false;
-  }, 300);
-});
-
 document.body.addEventListener('pointerdown', e => {
   const target = e.target;
-  if (target.closest('#counter') || target.closest('#emojiSelector')) return;
+  if (
+    target.closest('#counter') ||
+    target.closest('#emojiSelector') ||
+    target.closest('.emojiChoice') ||
+    target.closest('.modal') ||
+    target.closest('.gift-box') ||
+    target.closest('button')
+  ) return;
   handleTouch(e.clientX, e.clientY, target);
 });
 
@@ -691,26 +688,19 @@ window.addEventListener('resize', () => {
   confettiCanvas.height = H;
 });
 
-// Обработка клика по экрану для отправки эмодзи, кроме исключений
 document.addEventListener('click', (e) => {
-  const ignoredIds = ['noteButton', 'counter', 'helpButton'];
-  const ignoredClasses = ['emojiChoice', 'modal', 'gift-box'];
-
-  let target = e.target;
-
-  // Проверка ID и class
-  const isIgnored = ignoredIds.includes(target.id) ||
-                    ignoredClasses.some(cls => target.classList.contains(cls)) ||
-                    target.closest('.modal') !== null;
-
-  if (!isIgnored) {
-    createRandomEmoji(e.clientX, e.clientY);
-    myTouches++;
-    updateCounter();
-    checkReward();
-    socket.emit('touch', { roomId });
-  }
+  const target = e.target;
+  if (
+    target.closest('#counter') ||
+    target.closest('#emojiSelector') ||
+    target.closest('.emojiChoice') ||
+    target.closest('.modal') ||
+    target.closest('.gift-box') ||
+    target.closest('button')
+  ) return;
+  handleTouch(e.clientX, e.clientY, target);
 });
+
 // Отслеживаем "потерю фокуса" окна — возможный скриншот
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
