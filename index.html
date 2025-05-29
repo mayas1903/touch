@@ -431,35 +431,44 @@ document.body.addEventListener('pointerdown', e => {
   constructor() {
     this.x = window.innerWidth / 2;
     this.y = window.innerHeight / 2;
-    const angle = (Math.random() * 120 - 60) * (Math.PI / 180); // разброс ±60° относительно вверх
-    const speed = 6 + Math.random() * 8; // скорость вылета
-    this.vx = speed * Math.cos(angle);
-    this.vy = speed * Math.sin(angle) * -1; // вверх, поэтому минус
-    this.size = 6 + Math.random() * 4;
+    const angle = Math.random() * 2 * Math.PI;
+    const speed = 5 + Math.random() * 10; // мощный выстрел
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.size = 6 + Math.random() * 8; // крупнее
+    this.color = `hsl(${Math.floor(Math.random() * 360)}, 90%, 60%)`; // яркие цвета
+    this.gravity = 0.15;
     this.opacity = 1;
-    this.gravity = 0.3 + Math.random() * 0.2; // гравитация
-    this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+    this.friction = 0.95; // замедление полёта
     this.rotation = Math.random() * 360;
     this.rotationSpeed = (Math.random() - 0.5) * 10;
   }
 
   update() {
-    this.vx *= 0.95; // небольшое трение по горизонтали
-    this.vy += this.gravity; // гравитация тянет вниз
+    this.vx *= this.friction;
+    this.vy *= this.friction;
+    this.vy += this.gravity; // падение вниз
     this.x += this.vx;
     this.y += this.vy;
-    this.opacity -= 0.02;
+    this.opacity -= 0.02; // постепенно исчезают
     this.rotation += this.rotationSpeed;
   }
 
-  draw() {
+  draw(ctx) {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation * Math.PI / 180);
     ctx.globalAlpha = Math.max(this.opacity, 0);
     ctx.fillStyle = this.color;
-    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size / 2);
+    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size / 3);
     ctx.restore();
+  }
+}
+
+function createConfetti(count) {
+  confettiParticles = [];
+  for (let i = 0; i < count; i++) {
+    confettiParticles.push(new ConfettiParticle());
   }
 }
 
@@ -468,8 +477,10 @@ function animateConfetti() {
   ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
   confettiParticles.forEach((p, i) => {
     p.update();
-    p.draw();
-    if (p.opacity <= 0) confettiParticles.splice(i, 1);
+    p.draw(ctx);
+    if (p.opacity <= 0) {
+      confettiParticles.splice(i, 1);
+    }
   });
   if (confettiParticles.length > 0) {
     requestAnimationFrame(animateConfetti);
@@ -480,12 +491,9 @@ function animateConfetti() {
 }
 
 function startConfetti() {
-  confettiParticles = [];
-  for (let i = 0; i < 150; i++) { // 150 частиц — красивый взрыв
-    confettiParticles.push(new ConfettiParticle());
-  }
-  confettiCanvas.style.display = 'block';
   confettiAnimating = true;
+  createConfetti(150); // много ярких частиц
+  confettiCanvas.style.display = 'block';
   animateConfetti();
 }
 
