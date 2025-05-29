@@ -427,72 +427,66 @@ document.body.addEventListener('pointerdown', e => {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    class ConfettiParticle {
+   class ConfettiParticle {
   constructor() {
-    const angle = Math.random() * 2 * Math.PI;
-    const radius = 20 + Math.random() * 30;
     this.x = window.innerWidth / 2;
     this.y = window.innerHeight / 2;
-    this.vx = Math.cos(angle) * radius;
-    this.vy = Math.sin(angle) * radius;
-    this.size = 4 + Math.random() * 6;
-    this.scale = 0.3;
+    const angle = (Math.random() * 120 - 60) * (Math.PI / 180); // разброс ±60° относительно вверх
+    const speed = 6 + Math.random() * 8; // скорость вылета
+    this.vx = speed * Math.cos(angle);
+    this.vy = speed * Math.sin(angle) * -1; // вверх, поэтому минус
+    this.size = 6 + Math.random() * 4;
     this.opacity = 1;
-    this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+    this.gravity = 0.3 + Math.random() * 0.2; // гравитация
+    this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
     this.rotation = Math.random() * 360;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+    this.rotationSpeed = (Math.random() - 0.5) * 10;
   }
 
   update() {
+    this.vx *= 0.95; // небольшое трение по горизонтали
+    this.vy += this.gravity; // гравитация тянет вниз
     this.x += this.vx;
     this.y += this.vy;
-    this.vx *= 1.08;
-    this.vy *= 1.08;
-    this.scale += 0.015;
-    this.opacity -= 0.01;
+    this.opacity -= 0.02;
+    this.rotation += this.rotationSpeed;
   }
 
   draw() {
     ctx.save();
     ctx.translate(this.x, this.y);
-    ctx.rotate(this.rotation);
-    ctx.scale(this.scale, this.scale);
+    ctx.rotate(this.rotation * Math.PI / 180);
     ctx.globalAlpha = Math.max(this.opacity, 0);
     ctx.fillStyle = this.color;
-    ctx.fillRect(-5, -2, 10, 4);
+    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size / 2);
     ctx.restore();
   }
 }
 
-    function createConfetti(count) {
-      confettiParticles = [];
-      for (let i = 0; i < count; i++) {
-        confettiParticles.push(new ConfettiParticle());
-      }
-    }
-
-   let confettiAnimating = false;
-
 function animateConfetti() {
-  if (!confettiAnimating) return; // прекращаем анимацию, если флаг снят
+  if (!confettiAnimating) return;
   ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-  confettiParticles.forEach(p => {
+  confettiParticles.forEach((p, i) => {
     p.update();
     p.draw();
+    if (p.opacity <= 0) confettiParticles.splice(i, 1);
   });
-  requestAnimationFrame(animateConfetti);
+  if (confettiParticles.length > 0) {
+    requestAnimationFrame(animateConfetti);
+  } else {
+    confettiAnimating = false;
+    confettiCanvas.style.display = 'none';
+  }
 }
 
 function startConfetti() {
-  confettiAnimating = true;
-  createConfetti(500);
+  confettiParticles = [];
+  for (let i = 0; i < 150; i++) { // 150 частиц — красивый взрыв
+    confettiParticles.push(new ConfettiParticle());
+  }
   confettiCanvas.style.display = 'block';
+  confettiAnimating = true;
   animateConfetti();
-  setTimeout(() => {
-    confettiAnimating = false;
-    confettiCanvas.style.display = 'none';
-    confettiParticles = [];
-  }, 3000);
 }
 
   </script>
