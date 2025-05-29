@@ -162,16 +162,6 @@
       animation: spin 2s linear infinite;
     }
 
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 10000;
-      display: none;
-    }
-
     @keyframes sparkle {
       0%, 100% {opacity: 0.8;}
       50% {opacity: 0.4;}
@@ -197,6 +187,14 @@
   transform: scale(1.3);
   box-shadow: 0 0 10px #ff69b4;
   background: #fff0f5;
+}
+    
+@keyframes sway {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  25%  { transform: translateX(-5px) rotate(-5deg); }
+  50%  { transform: translateX(0px) rotate(0deg); }
+  75%  { transform: translateX(5px) rotate(5deg); }
+  100% { transform: translateX(0px) rotate(0deg); }
 }
 
   </style>
@@ -462,17 +460,17 @@ document.querySelectorAll('.gift-box').forEach(box => {
   });
 });
     function showRandomReward() {
-      const gifts = [
-        'Telegram Premium на 3 месяца!',
-        'Telegram Premium на 1 месяц!',
-        'Звезды 250 штук!',
-        'Звезды 500 штук!',
-      ];
-      const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
-      document.getElementById('rewardResultText').innerHTML = `Вам выпал:<br><strong>${randomGift}</strong>`;
-      openModal(rewardResultModal);
-      startConfetti();
-    }
+  const gifts = [
+    'Telegram Premium на 3 месяца!',
+    'Telegram Premium на 1 месяц!',
+    'Звезды 250 штук!',
+    'Звезды 500 штук!',
+  ];
+  const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
+  document.getElementById('rewardResultText').innerHTML = `Вам выпал:<br><strong>${randomGift}</strong>`;
+  openModal(rewardResultModal);
+  startSakuraRain(); // 🌸 тут новая магия
+}
 
     closeRewardBtn.onclick = () => {
       rewardClaimed = true;
@@ -576,142 +574,65 @@ document.body.addEventListener('pointerdown', e => {
   checkReward();
 });
 
-    // Анимация конфетти
-   const confettiCanvas = document.createElement('canvas');
-const ctx = confettiCanvas.getContext('2d');
-document.body.appendChild(confettiCanvas);
+ function startSakuraRain() {
+  const petals = [];
+  const NUM_PETALS = 40;
 
-let W = window.innerWidth;
-let H = window.innerHeight;
+  for (let i = 0; i < NUM_PETALS; i++) {
+    const petal = document.createElement('div');
+    petal.innerHTML = '<img src="https://i.postimg.cc/FzMsFFn7/sakura-petal.png" alt="petal" />';
+    const img = petal.querySelector('img');
 
-confettiCanvas.width = W;
-confettiCanvas.height = H;
-confettiCanvas.style.position = 'fixed';
-confettiCanvas.style.top = '0';
-confettiCanvas.style.left = '0';
-confettiCanvas.style.pointerEvents = 'none';
-confettiCanvas.style.zIndex = '9999';
+    const size = 20 + Math.random() * 20;
+    const startX = Math.random() * window.innerWidth;
+    const driftX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 30);
+    const startY = -50 - Math.random() * 50;
 
-class Confetti {
-  constructor() {
-    this.x = Math.random() * W;
-    this.y = Math.random() * H - H;
-    this.size = 15; // фиксированный размер
-    this.speedY = 3 + Math.random() * 1; // постоянная скорость падения
-    this.speedX = (Math.random() - 0.5) * 1; // небольшой разброс по X
-    this.opacity = 1;
+    petal.style.position = 'fixed';
+    petal.style.left = `${startX}px`;
+    petal.style.top = `${startY}px`;
+    petal.style.pointerEvents = 'none';
+    petal.style.zIndex = 9999;
+    
+    img.style.width = `${size}px`;
+    img.style.height = 'auto';
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 1s ease';
+    
+    // Добавляем покачивание
+    img.style.animation = `sway ${3 + Math.random()}s ease-in-out infinite`;
 
-    this.rotation = Math.random() * 360;
-    this.rotationSpeed = (Math.random() - 0.5) * 5;
+    document.body.appendChild(petal);
+    petals.push(petal);
 
-    this.colorHue = Math.floor(Math.random() * 360);
-  }
+    // Плавное появление
+    setTimeout(() => {
+      img.style.opacity = '1';
+    }, 10);
 
-  update() {
-    this.y += this.speedY;
-    this.x += this.speedX;
-    this.rotation += this.rotationSpeed;
-
-    if (this.x > W) this.x = 0;
-    if (this.x < 0) this.x = W;
-
-    if (this.y > H + this.size) {
-      this.reset();
-    }
-  }
-
-  reset() {
-    this.x = Math.random() * W;
-    this.y = -this.size;
-    this.opacity = 1;
-    this.size = 15;
-    this.speedY = 3 + Math.random();
-    this.speedX = (Math.random() - 0.5) * 1;
-    this.rotation = Math.random() * 360;
-    this.rotationSpeed = (Math.random() - 0.5) * 5;
-    this.colorHue = Math.floor(Math.random() * 360);
-  }
-
-  draw(ctx) {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.rotation * Math.PI / 180);
-
-    const grad = ctx.createLinearGradient(-this.size/2, -this.size/2, this.size/2, this.size/2);
-    grad.addColorStop(0, `hsl(${this.colorHue}, 90%, 75%)`);
-    grad.addColorStop(0.5, `hsl(${this.colorHue}, 100%, 50%)`);
-    grad.addColorStop(1, `hsl(${this.colorHue}, 90%, 75%)`);
-
-    ctx.fillStyle = grad;
-    ctx.shadowColor = `hsl(${this.colorHue}, 100%, 70%)`;
-    ctx.shadowBlur = 6;
-
-    ctx.globalAlpha = this.opacity;
-
-    // Только прямоугольники, чуть тоньше
-    ctx.fillRect(-this.size / 2, -this.size / 6, this.size, this.size / 3);
-
-    ctx.restore();
-  }
-}
-
-let confettiPieces = [];
-const CONFETTI_COUNT = 300;
-
-function initConfetti() {
-  confettiPieces = [];
-  for (let i = 0; i < CONFETTI_COUNT; i++) {
-    confettiPieces.push(new Confetti());
-  }
-}
-
-function render() {
-  ctx.clearRect(0, 0, W, H);
-  confettiPieces.forEach(c => {
-    c.update();
-    c.draw(ctx);
-  });
-  requestAnimationFrame(render);
-}
-
-function startConfetti() {
-  confettiCanvas.style.display = 'block';
-  confettiCanvas.style.opacity = '1';
-  initConfetti();
-  render();
-
-  // Начинаем плавное исчезновение через 4 секунды
-  let fadeDuration = 4000;
-  let startTime = null;
-
-  function fadeOut(timestamp) {
-    if (!startTime) startTime = timestamp;
-    let elapsed = timestamp - startTime;
-    let progress = Math.min(elapsed / fadeDuration, 1);
-    confettiCanvas.style.opacity = 1 - progress;
-
-    // Для каждого конфетти плавно уменьшаем opacity
-    confettiPieces.forEach(c => {
-      c.opacity = 1 - progress;
+    // Анимация падения (движение по траектории)
+    const duration = 4000;
+    petal.animate([
+      {
+        transform: `translate(0px, 0px)`,
+        opacity: 1
+      },
+      {
+        transform: `translate(${driftX}px, 100vh)`,
+        opacity: 0.05
+      }
+    ], {
+      duration,
+      easing: 'ease-in-out',
+      fill: 'forwards'
     });
 
-    if (progress < 1) {
-      requestAnimationFrame(fadeOut);
-    } else {
-      confettiCanvas.style.display = 'none';
-      confettiPieces = [];
-    }
+    // Удаление
+    setTimeout(() => {
+      petal.remove();
+    }, duration + 200);
   }
-
-  requestAnimationFrame(fadeOut);
 }
-
-window.addEventListener('resize', () => {
-  W = window.innerWidth;
-  H = window.innerHeight;
-  confettiCanvas.width = W;
-  confettiCanvas.height = H;
-});
     
   </script>
 </body>
