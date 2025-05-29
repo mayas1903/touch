@@ -207,6 +207,16 @@
   </svg>
 </div>
 
+  <!-- Панель выбора эмодзи -->
+<div id="emojiPicker" style="margin-bottom: 15px; user-select: none;">
+  <span style="font-size: 30px; cursor: pointer; margin: 0 8px;" data-emoji="❤️">❤️</span>
+  <span style="font-size: 30px; cursor: pointer; margin: 0 8px;" data-emoji="🌸">🌸</span>
+  <span style="font-size: 30px; cursor: pointer; margin: 0 8px;" data-emoji="✨">✨</span>
+  <span style="font-size: 30px; cursor: pointer; margin: 0 8px;" data-emoji="💩">💩</span>
+  <span style="font-size: 30px; cursor: pointer; margin: 0 8px;" data-emoji="💋">💋</span>
+  <span style="font-size: 30px; cursor: pointer; margin: 0 8px;" data-emoji="🔥">🔥</span>
+</div>
+
   <div id="counter" role="button" aria-label="Счётчик касаний">Ты: 0 | Друг: 0</div>
 
   <div id="progressModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="progressTitle" aria-describedby="progressDesc">
@@ -277,9 +287,12 @@
       requestAnimationFrame(update);
     }
 
-    function createRandomEmoji(x, y, emoji) {
-  const emojis = ['💗'];
-  const chosenEmoji = emoji || emojis[Math.floor(Math.random() * emojis.length)];
+    let selectedEmoji = '❤️';          // эмодзи для себя
+let friendSelectedEmoji = '❤️';    // эмодзи друга
+
+function createRandomEmoji(x, y, emoji) {
+  const emojisSet = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
+  const chosenEmoji = emoji || selectedEmoji || emojisSet[0];
   const span = document.createElement('span');
   span.className = 'heart';
   span.textContent = chosenEmoji;
@@ -290,6 +303,7 @@
     span.remove();
   }, 1700);
 }
+
 
     function updateCounter() {
       counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
@@ -408,7 +422,7 @@ document.body.addEventListener('pointerdown', e => {
     // Обработка данных от друга
    socket.on('friendTouch', ({ x, y }) => {
   friendTouches++;
-  createRandomEmoji(x, y, '💗'); // поменял createEmoji на createRandomEmoji
+  createRandomEmoji(x, y, friendSelectedEmoji);
  updateCounter();
   updateProgressModal();
   checkReward();
@@ -544,6 +558,36 @@ function startConfetti() {
   requestAnimationFrame(fadeOut);
 }
 
+const emojiButtons = document.querySelectorAll('.emojiBtn');
+emojiButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedEmoji = btn.textContent;
+    emojiButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedEmoji = btn.textContent;
+    emojiButtons.forEach(b => b.style.opacity = '0.5');
+    btn.style.opacity = '1';
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({
+        type: 'emojiChange',
+        emoji: selectedEmoji,
+        userId: myUserId  // если есть идентификатор пользователя
+    // Подсветить выбранную кнопку (чтобы было видно, что выбрано)
+    emojiButtons.forEach(b => b.style.opacity = '0.5');
+    btn.style.opacity = '1';
+   }));
+    }
+  });
+});
+// Инициализация подсветки для дефолтного эмодзи
+emojiButtons.forEach(b => {
+  if (b.textContent === selectedEmoji) {
+    b.style.opacity = '1';
+  } else {
+    b.style.opacity = '0.5';
+  }
+});
 
 window.addEventListener('resize', () => {
   W = window.innerWidth;
