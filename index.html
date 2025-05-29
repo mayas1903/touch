@@ -56,7 +56,7 @@
       box-sizing: border-box;
       user-select: none;
       word-wrap: break-word;
-      z-index: 1000;
+      z-index: 11000 !important;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
@@ -150,7 +150,7 @@
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      z-index: 5;
+      z-index: 10000;
       display: none;
     }
 
@@ -514,9 +514,36 @@ function render() {
 
 function startConfetti() {
   confettiCanvas.style.display = 'block';
+  confettiCanvas.style.opacity = '1';
   initConfetti();
   render();
+
+  // Начинаем плавное исчезновение через 4 секунды
+  let fadeDuration = 4000;
+  let startTime = null;
+
+  function fadeOut(timestamp) {
+    if (!startTime) startTime = timestamp;
+    let elapsed = timestamp - startTime;
+    let progress = Math.min(elapsed / fadeDuration, 1);
+    confettiCanvas.style.opacity = 1 - progress;
+
+    // Для каждого конфетти плавно уменьшаем opacity
+    confettiPieces.forEach(c => {
+      c.opacity = 1 - progress;
+    });
+
+    if (progress < 1) {
+      requestAnimationFrame(fadeOut);
+    } else {
+      confettiCanvas.style.display = 'none';
+      confettiPieces = [];
+    }
+  }
+
+  requestAnimationFrame(fadeOut);
 }
+
 
 window.addEventListener('resize', () => {
   W = window.innerWidth;
