@@ -467,7 +467,7 @@ document.querySelectorAll('.gift-box').forEach(box => {
     'Звезды 500 штук!',
   ];
   const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
-  document.getElementById('rewardResultText').innerHTML = `Вам выпал:<br><strong>${randomGift}</strong>`;
+  document.getElementById('rewardResultText').innerHTML = `Вам выпало:<br><strong>${randomGift}</strong>`;
   openModal(rewardResultModal);
   startSakuraRain(); // 🌸 тут новая магия
 }
@@ -582,22 +582,24 @@ function startSakuraRain() {
     </svg>`;
 
   for (let i = 0; i < NUM_PETALS; i++) {
-    const petal = document.createElement('div');
-    petal.innerHTML = svgMarkup;
-    const svg = petal.querySelector('svg');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = svgMarkup;
+    const svg = wrapper.querySelector('svg');
 
     const size = 20 + Math.random() * 20;
     const startX = Math.random() * window.innerWidth;
     const driftX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 30);
     const startY = -50 - Math.random() * 50;
 
-    petal.style.position = 'fixed';
-    petal.style.left = `${startX}px`;
-    petal.style.top = `${startY}px`;
-    petal.style.width = `${size}px`;
-    petal.style.height = `${size}px`;
-    petal.style.pointerEvents = 'none';
-    petal.style.zIndex = 9999;
+    // Обёртка div
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = `${startX}px`;
+    wrapper.style.top = `${startY}px`;
+    wrapper.style.width = `${size}px`;
+    wrapper.style.height = `${size}px`;
+    wrapper.style.pointerEvents = 'none';
+    wrapper.style.zIndex = '9999';
+    wrapper.style.transform = 'translate(0, 0)'; // 🔑 начальное значение
 
     svg.style.width = '100%';
     svg.style.height = '100%';
@@ -605,29 +607,28 @@ function startSakuraRain() {
     svg.style.transition = 'opacity 1s ease';
     svg.style.animation = `sway ${3 + Math.random()}s ease-in-out infinite`;
 
-    document.body.appendChild(petal);
+    document.body.appendChild(wrapper);
 
-    // Плавное появление
     setTimeout(() => {
       svg.style.opacity = '1';
     }, 10);
 
-    // Анимация падения
-    const duration = 4000;
-    petal.animate([
-      { transform: `translate(0px, 0px)`, opacity: 1 },
-      { transform: `translate(${driftX}px, 100vh)`, opacity: 0.05 }
+    // Анимация полёта
+    wrapper.animate([
+      { transform: 'translate(0, 0)', opacity: 1 },
+      { transform: `translate(${driftX}px, 100vh)`, opacity: 0 }
     ], {
-      duration,
+      duration: 4000,
       easing: 'ease-in-out',
       fill: 'forwards'
     });
 
     setTimeout(() => {
-      petal.remove();
-    }, duration + 200);
+      wrapper.remove();
+    }, 4200);
   }
 }
+
   </script>
 </body>
 </html>
