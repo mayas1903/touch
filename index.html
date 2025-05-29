@@ -97,6 +97,24 @@
       background: #005ecb;
     }
 
+.gift-box {
+  font-size: 40px;
+  cursor: pointer;
+  transition: transform 0.4s ease;
+  user-select: none;
+}
+.gift-box:hover {
+  transform: scale(1.2);
+}
+.gift-box.opened {
+  animation: boxOpen 0.6s forwards;
+}
+@keyframes boxOpen {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.5) rotate(15deg); }
+  100% { transform: scale(1.2) rotate(-5deg); opacity: 0; }
+}
+
     .heart {
       position: absolute;
       width: 40px;
@@ -166,7 +184,15 @@
   </style>
 </head>
 <body>
-
+ <div id="boxSelectionModal" class="modal">
+  <h3>🤩 Выберите одну из шкатулок</h3>
+  <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+    <div class="gift-box" data-box="1">🎁</div>
+    <div class="gift-box" data-box="2">🎁</div>
+    <div class="gift-box" data-box="3">🎁</div>
+  </div>
+</div>
+  
   <!-- Кнопка для создания записки -->
 <button id="noteButton" style="margin-top: 10px; padding: 10px 20px; border-radius: 12px; background: #ff69b4; color: white; border: none; font-size: 16px; cursor: pointer;">💌 Написать записку</button>
 
@@ -389,7 +415,21 @@ const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
       }, 2000);
     };
 
-    function showRandomReward() {
+    const boxSelectionModal = document.getElementById('boxSelectionModal');
+
+function openBoxSelection() {
+  openModal(boxSelectionModal);
+}
+document.querySelectorAll('.gift-box').forEach(box => {
+  box.addEventListener('click', () => {
+    box.classList.add('opened');
+    setTimeout(() => {
+      closeModal(boxSelectionModal);
+      showRandomReward(); // Показываем награду после анимации
+    }, 700);
+  });
+});
+    function openBoxSelection() {
       const gifts = [
         'Telegram Premium на 3 месяца!',
         'Telegram Premium на 1 месяц!',
