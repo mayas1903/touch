@@ -136,6 +136,7 @@
 </style>
 </head>
 <body>
+  <canvas id="confetti-canvas"></canvas>
 <p id="description" style="
   font-size: 15px;
   color: #d6336c;
@@ -286,7 +287,7 @@ socket.on('connect', () => {
 
 function startConfetti() {
   confettiParticles = [];
-  for (let i = 0; i < 250; i++) { // раньше было 150
+  for (let i = 0; i < 400; i++) { // раньше было 150
     confettiParticles.push(new ConfettiParticle());
   }
   confettiCanvas.style.display = 'block';
