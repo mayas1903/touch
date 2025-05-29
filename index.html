@@ -350,6 +350,7 @@
 };
 
     counter.addEventListener('click', () => {
+      updateProgressModal();
       openModal(progressModal);
     });
 
@@ -399,9 +400,9 @@ function handleTouch(x, y) {
     });
 
     // Обработка данных от друга
-    socket.on('friendTouch', ({ x, y }) => {
+   socket.on('friendTouch', ({ x, y }) => {
   friendTouches++;
-  createEmoji(x, y, '💗');
+  createRandomEmoji(x, y, '💗'); // поменял createEmoji на createRandomEmoji
   animateNumber(counter, lastMyTouches, myTouches);
   lastFriendTouches = friendTouches;
   updateProgressModal();
