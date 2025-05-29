@@ -285,9 +285,6 @@
       requestAnimationFrame(update);
     }
 
-    let selectedEmoji = '❤️';          // эмодзи для себя
-let friendSelectedEmoji = '❤️';    // эмодзи друга
-
 function createRandomEmoji(x, y, emoji) {
   const emojisSet = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
   const chosenEmoji = emoji || selectedEmoji || emojisSet[0];
@@ -302,19 +299,6 @@ function createRandomEmoji(x, y, emoji) {
   }, 1700);
 }
 
-const emojiPicker = document.getElementById('emojiPicker');
-
-emojiPicker.addEventListener('click', (e) => {
-  const target = e.target;
-  if (target.dataset && target.dataset.emoji) {
-    selectedEmoji = target.dataset.emoji;
-    // Отправляем свой выбор другу (через сервер)
-    socket.emit('emojiSelected', { roomId, emoji: selectedEmoji });
-    // Можно визуально выделить выбранный эмодзи (например, рамкой)
-    updateEmojiPickerUI(selectedEmoji);
-  }
-});
-
 function updateEmojiPickerUI(selected) {
   [...emojiPicker.children].forEach(span => {
     span.style.border = span.dataset.emoji === selected ? '2px solid #d6336c' : 'none';
@@ -322,6 +306,7 @@ function updateEmojiPickerUI(selected) {
   });
 }
 updateEmojiPickerUI(selectedEmoji);
+    
     function updateCounter() {
       counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
     }
@@ -393,63 +378,101 @@ const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес т�
 const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe)
   ? window.Telegram.WebApp.initDataUnsafe.chat.id
   : 'default_room';
+
+// Подключаемся к WebSocket-серверу
 socket.on('connect', () => {
   console.log('🧠 Подключились к WebSocket-серверу');
   socket.emit('joinRoom', roomId);
 });
-    socket.on('emojiSelected', ({ emoji }) => {
-  friendTouches++;
-  updateCounter();
-  createRandomEmoji(x, y, friendSelectedEmoji);
-  checkReward();
+
+// Обработчик, когда другой пользователь выбирает эмодзи
+socket.on('emojiSelected', ({ emoji, x, y }) => {
+  friendTouches++;  // Увеличиваем количество касаний друга
+  updateCounter();  // Обновляем счетчик касаний
+  createRandomEmoji(x, y, emoji);  // Отображаем эмодзи на экране
+  checkReward();  // Проверка на получение награды
 });
-    socket.on('touch', ({ x, y }) => {
+
+// Обработчик касания другого пользователя
+socket.on('touch', ({ x, y, emoji }) => {
   friendTouches++;
   updateCounter();
   updateProgressModal();
-  createRandomEmoji(x, y, friendSelectedEmoji);
+  createRandomEmoji(x, y, emoji);  // Показываем эмодзи на экране
   checkReward();
 });
 
-
-    // Отправка касания на сервер
-   function sendTouch(x, y) {
-  socket.emit('touch', { roomId, x, y });
+// Отправка эмодзи и касания на сервер
+function sendTouch(x, y, emoji) {
+  socket.emit('touch', { roomId, x, y, emoji });
 }
 
-    // Обработчик касания на странице
-    let touchCooldown = false;
-    let isModalOpen = false;
-    
+function sendEmoji(emoji, x, y) {
+  socket.emit('emojiSelected', { roomId, emoji, x, y });
+}
+
+// Обработчик касания на странице
+let touchCooldown = false;
+let isModalOpen = false;
+let selectedEmoji = '❤️';  // Эмодзи по умолчанию
+let myTouches = 0;
+
+// Функция для обработки касания
 function handleTouch(x, y) {
   if (touchCooldown || isModalOpen) return;
   touchCooldown = true;
+
   myTouches++;
   updateCounter();
   updateProgressModal();
-  createRandomEmoji(x, y, selectedEmoji);
-  checkReward();
-  sendTouch(x, y); // Отправляем касание другу
-  setTimeout(() => (touchCooldown = false), 100); // Задержка между касаниями
+  
+  createRandomEmoji(x, y, selectedEmoji);  // Отображаем эмодзи на экране
+  sendTouch(x, y, selectedEmoji);  // Отправляем касание с эмодзи
+
+  checkReward();  // Проверка на награды
+
+  setTimeout(() => (touchCooldown = false), 100);  // Задержка между касаниями
 }
 
+// Обработчик выбора эмодзи
+const emojiPicker = document.getElementById('emojiPicker');
+emojiPicker.addEventListener('click', (e) => {
+  const target = e.target;
+  if (target.dataset && target.dataset.emoji) {
+    selectedEmoji = target.dataset.emoji;  // Обновляем выбранное эмодзи
 
-    // Ловим touchstart и click (для десктопа)
-    let ignoreClick = false;
+    // Отправляем выбранное эмодзи другим пользователям
+    sendEmoji(selectedEmoji, Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+  }
+
+  // Обновляем UI для выделения выбранного эмодзи
+  updateEmojiPickerUI(selectedEmoji);
+});
+
+// Функция для выделения выбранного эмодзи
+function updateEmojiPickerUI(selected) {
+  [...emojiPicker.children].forEach(span => {
+    span.style.border = span.dataset.emoji === selected ? '2px solid #d6336c' : 'none';
+    span.style.borderRadius = '6px';
+  });
+}
+
+// Ловим touchstart и click (для десктопа)
+let ignoreClick = false;
 
 document.body.addEventListener('touchstart', e => {
   if (e.target === counter) return;
   const touch = e.touches[0];
-  handleTouch(touch.clientX, touch.clientY);
+  handleTouch(touch.clientX, touch.clientY);  // Обрабатываем касание
   ignoreClick = true;
   setTimeout(() => {
     ignoreClick = false;
-  }, 300); // 500 мс — достаточно, чтобы игнорировать клик после касания
+  }, 300);  // 500 мс — достаточно, чтобы игнорировать клик после касания
 });
 
 document.body.addEventListener('pointerdown', e => {
   if (e.target === counter) return;
-  handleTouch(e.clientX, e.clientY);
+  handleTouch(e.clientX, e.clientY);  // Обрабатываем клик
 });
 
     // Анимация конфетти
