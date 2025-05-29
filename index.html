@@ -352,6 +352,8 @@ function checkReward() {
 }
 
 openRewardBtn.onclick = () => {
+  closeModal(rewardAvailableModal);
+  openModal(rewardLoadingModal);
 
   setTimeout(() => {
     closeModal(rewardLoadingModal);
