@@ -193,15 +193,6 @@
       pointer-events: none;
     "></span>
   </p>
-
-  <div id="emojiSelector" style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">❤️</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🌸</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">✨</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💩</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💋</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🔥</span>
-</div>
   
 <div id="pulseDots" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
   <svg width="80" height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -216,9 +207,18 @@
     </circle>
   </svg>
 </div>
-
+  
+  <div id="emojiSelector" style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">❤️</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🌸</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">✨</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💩</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💋</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🔥</span>
+</div>
+  
   <div id="counter" role="button" aria-label="Счётчик касаний">Ты: 0 | Друг: 0</div>
-
+  
   <div id="progressModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="progressTitle" aria-describedby="progressDesc">
     <h3 id="progressTitle">💖 Ваш прогресс</h3>
     <p>Ты: <span id="progressMy">0</span></p>
@@ -394,8 +394,9 @@ document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
     let touchCooldown = false;
     let isModalOpen = false;
     
-function handleTouch(x, y) {
+function handleTouch(x, y, target = null) {
   if (touchCooldown || isModalOpen) return;
+  if (target && (target.closest('#emojiSelector') || target.classList.contains('emojiChoice'))) return;
   touchCooldown = true;
   setTimeout(() => (touchCooldown = false), 100);
   myTouches++;
@@ -409,20 +410,17 @@ function handleTouch(x, y) {
     let ignoreClick = false;
 
 document.body.addEventListener('touchstart', e => {
-  if (e.target === counter) return;
   const touch = e.touches[0];
-  handleTouch(touch.clientX, touch.clientY);
+  handleTouch(touch.clientX, touch.clientY, e.target);
   ignoreClick = true;
   setTimeout(() => {
     ignoreClick = false;
-  }, 300); // 500 мс — достаточно, чтобы игнорировать клик после касания
+  }, 300);
 });
 
 document.body.addEventListener('pointerdown', e => {
-  if (e.target === counter) return;
-  handleTouch(e.clientX, e.clientY);
+  handleTouch(e.clientX, e.clientY, e.target);
 });
-
 
     // Обработка данных от друга
    socket.on('friendTouch', ({ x, y, emoji }) => {
