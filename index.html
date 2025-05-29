@@ -363,9 +363,9 @@ socket.on('connect', () => {
 });
 
     // Отправка касания на сервер
-    function sendTouch(x, y) {
-      socket.emit('touch', { x, y });
-    }
+   function sendTouch(x, y) {
+  socket.emit('touch', { roomId, x, y });
+}
 
     // Обработчик касания на странице
     let touchCooldown = false;
@@ -373,7 +373,7 @@ socket.on('connect', () => {
 function handleTouch(x, y) {
    if (touchCooldown || isModalOpen) return;
   touchCooldown = true;
-  setTimeout(() => (touchCooldown = false), 100); // Задержка между касаниями
+  setTimeout(() => (touchCooldown = false), 200); // Задержка между касаниями
   myTouches++;
   updateCounter();
   createRandomEmoji(x, y);
