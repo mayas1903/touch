@@ -259,17 +259,19 @@
       requestAnimationFrame(update);
     }
 
-    function createRandomEmoji(x, y, emoji = ''💗', '💕', '💖', '💘', '💝', '💞') {
-      const span = document.createElement('span');
-      span.className = 'heart';
-      span.textContent = emoji;
-      span.style.left = (x - 20) + 'px';
-      span.style.top = (y - 20) + 'px';
-      document.body.appendChild(span);
-      setTimeout(() => {
-        span.remove();
-      }, 1200);
-    }
+    function createRandomEmoji(x, y, emoji) {
+  const emojis = ['💗', '💕', '💖', '💘', '💝', '💞'];
+  const chosenEmoji = emoji || emojis[Math.floor(Math.random() * emojis.length)];
+  const span = document.createElement('span');
+  span.className = 'heart';
+  span.textContent = chosenEmoji;
+  span.style.left = (x - 20) + 'px';
+  span.style.top = (y - 20) + 'px';
+  document.body.appendChild(span);
+  setTimeout(() => {
+    span.remove();
+  }, 1200);
+}
 
     function updateCounter() {
       counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
@@ -284,10 +286,12 @@
     }
 
     function openModal(modal) {
+      isModalOpen = true;
       modal.classList.add('show');
     }
 
     function closeModal(modal) {
+       isModalOpen = false;
       modal.classList.remove('show');
     }
 
