@@ -68,15 +68,6 @@
   pointer-events: auto;
   transform: translate(-50%, -50%);
 }
-.modal::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(2px);
-  z-index: -1;
-}
 
 .modal h2, .modal h3 {
   font-weight: 600;
@@ -355,13 +346,6 @@ function checkReward() {
 }
 
 openRewardBtn.onclick = () => {
-  closeModal(rewardAvailableModal);
-  openModal(rewardLoadingModal);
-  setTimeout(() => {
-  createEmoji(window.innerWidth / 2, window.innerHeight / 2, '🎊');
-  createEmoji(window.innerWidth / 2 + 40, window.innerHeight / 2, '🥳');
-  createEmoji(window.innerWidth / 2 - 40, window.innerHeight / 2, '🎉');
-}, 200);
 
   setTimeout(() => {
     closeModal(rewardLoadingModal);
