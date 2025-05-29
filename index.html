@@ -393,13 +393,14 @@ document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
     // Обработчик касания на странице
     let touchCooldown = false;
     let isModalOpen = false;
+    
 function handleTouch(x, y) {
-   if (touchCooldown || isModalOpen) return;
+  if (touchCooldown || isModalOpen) return;
   touchCooldown = true;
-  setTimeout(() => (touchCooldown = false), 100); // Задержка между касаниями
+  setTimeout(() => (touchCooldown = false), 100);
   myTouches++;
   updateCounter();
-  createRandomEmoji(x, y);
+  createRandomEmoji(x, y, selectedEmoji); // ✅ передаём выбранный эмодзи
   sendTouch(x, y);
   checkReward();
 }
