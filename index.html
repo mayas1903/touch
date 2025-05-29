@@ -100,10 +100,10 @@
   /* Сердечки */
  .heart {
   position: absolute;
-  width: 70px;
-  height: 70px;
+  width: 40px;
+  height: 40px;
   pointer-events: none;
-  animation: floatUp 1.7s ease forwards;
+  animation: floatUp 1.2s ease forwards;
   opacity: 1;
   z-index: 1000;
   font-size: 50px;       /* добавь, если хочешь увеличить эмодзи */
@@ -118,7 +118,7 @@
       opacity: 1;
     }
     100% {
-      transform: translateY(-80px) scale(1.5);
+      transform: translateY(-40px) scale(1.5);
       opacity: 0;
     }
   }
@@ -411,8 +411,8 @@ socket.on('friendTouch', ({ x, y }) => {
   function createEmoji(x, y, emoji = '💗') {
   const elem = document.createElement('div');
   elem.className = 'heart';
-  elem.style.left = (x - 35) + 'px';
-  elem.style.top = (y - 35) + 'px';
+elem.style.left = x + 'px';
+elem.style.top = y + 'px';
   elem.textContent = emoji;
   document.body.appendChild(elem);
   setTimeout(() => {
@@ -426,7 +426,7 @@ function animateCounter() {
   }, 150);
 }
 
-document.body.addEventListener('click', (e) => {
+document.body.addEventListener('touchstart', (e) => {
   if (e.target === counter) return;
   if (
     progressModal.classList.contains('show') ||
@@ -434,7 +434,8 @@ document.body.addEventListener('click', (e) => {
     rewardLoadingModal.classList.contains('show') ||
     rewardResultModal.classList.contains('show')
   ) return;
-
+  
+const touch = e.touches[0];
   createEmoji(e.clientX, e.clientY, '💗');
   myTouches++;
   socket.emit('touch', { roomId, x: e.clientX, y: e.clientY });
