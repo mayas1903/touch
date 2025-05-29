@@ -289,7 +289,6 @@
     }
 
     function createRandomEmoji(x, y, emoji) {
-  const emojis = ['💗'];
   const chosenEmoji = emoji || emojis[Math.floor(Math.random() * emojis.length)];
   const span = document.createElement('span');
   span.className = 'heart';
@@ -429,7 +428,7 @@ document.body.addEventListener('pointerdown', e => {
     // Обработка данных от друга
    socket.on('friendTouch', ({ x, y, emoji }) => {
   friendTouches++;
-  createRandomEmoji(x, y, emoji || '💗');
+  createRandomEmoji(x, y, emoji );
   updateCounter();
   updateProgressModal();
   checkReward();
