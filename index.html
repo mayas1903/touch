@@ -185,6 +185,19 @@
     #helpModal {
   font-size: 14px; 
 }
+    
+.emojiChoice {
+  cursor: pointer;
+  font-size: 30px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 10px;
+  padding: 5px;
+}
+.emojiChoice.selected {
+  transform: scale(1.3);
+  box-shadow: 0 0 10px #ff69b4;
+  background: #fff0f5;
+}
 
   </style>
 </head>
@@ -262,14 +275,15 @@
   </svg>
 </div>
   
-  <div id="emojiSelector" style="margin-top: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">❤️</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🌸</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">✨</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💩</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💋</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🔥</span>
+  <div id="emojiSelector">
+  <span class="emojiChoice">❤️</span>
+  <span class="emojiChoice">🌸</span>
+  <span class="emojiChoice">✨</span>
+  <span class="emojiChoice">💩</span>
+  <span class="emojiChoice">💋</span>
+  <span class="emojiChoice">🔥</span>
 </div>
+
   
   <div id="counter" role="button" aria-label="Счётчик касаний">Ты: 0 | Друг: 0</div>
   
@@ -494,12 +508,15 @@ const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.Web
 socket.emit('joinRoom', roomId);
 socket.on('connect', () => {
   document.querySelectorAll('.emojiChoice').forEach(el => {
-    el.addEventListener('click', () => {
-      selectedEmoji = el.textContent;
-      document.querySelectorAll('.emojiChoice').forEach(e => e.style.opacity = '0.5');
-      el.style.opacity = '1';
-    });
+  el.addEventListener('click', () => {
+    selectedEmoji = el.textContent;
+    document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
   });
+});
+// По умолчанию выделяем первый эмодзи
+document.querySelectorAll('.emojiChoice')[0].classList.add('selected');
+});
   document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
 console.log('🧠 Подключились к WebSocket-серверу');
 });
