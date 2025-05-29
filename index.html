@@ -184,8 +184,39 @@
   </style>
 </head>
 <body>
+
+  <!-- Кнопка помощи -->
+<div id="helpButton" style="
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 42px;
+  height: 42px;
+  background: #ffb6c1;
+  border-radius: 50%;
+  color: white;
+  font-size: 26px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 9999;
+">?</div>
+
+<!-- Модалка помощи -->
+<div id="helpModal" class="modal">
+  <h3>ℹ️ О приложении</h3>
+  <p>
+    Отправляй касания и поцелуйчики на расстоянии другу или любимому человеку.<br>
+    Когда вместе наберёте <strong>1к, 2к, 3к...</strong> касаний, вас ждёт приятный сюрприз 💝
+  </p>
+  <button onclick="closeModal(helpModal)">Понятно</button>
+</div>
+
  <div id="boxSelectionModal" class="modal">
-  <h3>🤩 Выберите одну из шкатулок</h3>
+  <h3>🤩 Выберите одну из коробочек:</h3>
   <div style="display: flex; justify-content: space-around; margin-top: 20px;">
     <div class="gift-box" data-box="1">🎁</div>
     <div class="gift-box" data-box="2">🎁</div>
@@ -211,33 +242,6 @@
   <p id="revealedNoteText"></p>
   <button onclick="closeModal(noteRevealModal)">Ок</button>
 </div>
-
-  <canvas id="confetti-canvas"></canvas>
-  <p id="description" style="
-    font-size: 15px;
-    color: #d6336c;
-    margin-bottom: 10px;
-    text-align: center;
-    max-width: 700px;
-    line-height: 1.4;
-    position: relative;
-    animation: glow 3s ease-in-out infinite alternate;
-  ">
-    Отправляй касания и поцелуйчики на расстоянии другу или любимому человеку.<br>
-    Когда вместе наберёте <strong>1000</strong> касаний, вас ждёт приятный сюрприз 💝
-    <span class="sparkle" style="
-      position: absolute;
-      top: -8px;
-      right: -12px;
-      width: 10px;
-      height: 10px;
-      background: radial-gradient(circle, #ff90b3 20%, transparent 70%);
-      border-radius: 50%;
-      animation: sparkle 1.8s infinite ease-in-out;
-      opacity: 0.8;
-      pointer-events: none;
-    "></span>
-  </p>
   
 <div id="pulseDots" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
   <svg width="80" height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -280,7 +284,7 @@
   </div>
 
   <div id="rewardLoadingModal" class="modal">
-    <h2>🎁 Открываем подарок...</h2>
+    <h2>🔥 Загрузка...</h2>
     <div style="margin-top: 20px; font-size: 24px;">⏳</div>
   </div>
 
@@ -358,6 +362,14 @@ saveNoteBtn.onclick = () => {
       }
       requestAnimationFrame(update);
     }
+
+    const helpButton = document.getElementById('helpButton');
+const helpModal = document.getElementById('helpModal');
+
+helpButton.addEventListener('click', () => {
+  openModal(helpModal);
+});
+
 const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
 
     function createRandomEmoji(x, y, emoji = selectedEmoji) {
