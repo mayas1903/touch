@@ -415,7 +415,7 @@ document.body.addEventListener('pointerdown', e => {
 });
 
     // Анимация конфетти
-    const confettiCanvas = document.createElement('canvas');
+   const confettiCanvas = document.createElement('canvas');
 const ctx = confettiCanvas.getContext('2d');
 document.body.appendChild(confettiCanvas);
 
@@ -434,10 +434,10 @@ class Confetti {
   constructor() {
     this.x = Math.random() * W;
     this.y = Math.random() * H - H; // стартуют над экраном
-    this.size = 7 + Math.random() * 8;
+    this.size = 15 + Math.random() * 10; // увеличенный размер
     this.color = `hsl(${Math.floor(Math.random() * 360)}, 80%, 60%)`;
-    this.speedY = 2 + Math.random() * 4;
-    this.speedX = (Math.random() - 0.5) * 2;
+    this.speedY = 4 + Math.random() * 2; // постоянная скорость падения
+    this.speedX = (Math.random() - 0.5) * 3; // чуть больше разброса по X
     this.opacity = 1;
 
     this.rotationX = Math.random() * 360;
@@ -458,7 +458,7 @@ class Confetti {
   }
 
   update() {
-    this.y += this.speedY;
+    this.y += this.speedY; // ровное падение без гравитации для отскока
     this.x += this.speedX;
 
     this.rotationX += this.rotationSpeedX;
@@ -470,7 +470,7 @@ class Confetti {
     if (this.y > H - this.size) {
       if (!this.isBouncing) {
         this.isBouncing = true;
-        this.bounceSpeed = - (2 + Math.random() * 2);
+        this.bounceSpeed = -(5 + Math.random() * 5); // сильный отскок
         this.rotationSpeedX = (Math.random() - 0.5) * 20;
         this.rotationSpeedY = (Math.random() - 0.5) * 20;
       }
@@ -478,10 +478,10 @@ class Confetti {
 
     if (this.isBouncing) {
       this.y += this.bounceSpeed;
-      this.bounceSpeed += 0.3;
+      this.bounceSpeed *= 0.95; // минимальное затухание, чтоб не прыгали вечно
       if (this.y >= H - this.size) {
         this.y = H - this.size;
-        if (Math.abs(this.bounceSpeed) < 0.5) {
+        if (Math.abs(this.bounceSpeed) < 1) {
           this.isBouncing = false;
           this.bounceSpeed = 0;
           this.rotationSpeedX = (Math.random() - 0.5) * 8;
@@ -489,15 +489,13 @@ class Confetti {
 
           this.bounceCount++;
 
-          // Начинаем плавный fade-out после maxBounces
+          // fade-out после максимума отскоков
           if (this.bounceCount >= this.maxBounces) {
-            this.opacity -= 0.02; // скорость fade-out
+            this.opacity -= 0.02;
             if (this.opacity <= 0) {
               this.reset();
             }
           }
-        } else {
-          this.bounceSpeed *= -0.6;
         }
       }
     }
@@ -505,14 +503,12 @@ class Confetti {
     if (this.x > W) this.x = 0;
     if (this.x < 0) this.x = W;
 
-    // Если ушла слишком низко (на всякий случай)
     if (this.y > H + this.size) {
       this.reset();
     }
   }
 
   reset() {
-    // Возвращаем частицу наверх, сбрасываем параметры
     this.x = Math.random() * W;
     this.y = -this.size;
     this.opacity = 1;
@@ -520,8 +516,8 @@ class Confetti {
     this.bounceSpeed = 0;
     this.bounceCount = 0;
 
-    this.speedY = 2 + Math.random() * 4;
-    this.speedX = (Math.random() - 0.5) * 2;
+    this.speedY = 4 + Math.random() * 2;
+    this.speedX = (Math.random() - 0.5) * 3;
     this.rotationSpeedX = (Math.random() - 0.5) * 8;
     this.rotationSpeedY = (Math.random() - 0.5) * 8;
   }
