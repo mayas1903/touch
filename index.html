@@ -340,6 +340,7 @@
 
     // Обработчик касания на странице
     let touchCooldown = false;
+    let isModalOpen = false;
 function handleTouch(x, y) {
    if (touchCooldown || isModalOpen) return;
   touchCooldown = true;
