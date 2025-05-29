@@ -680,6 +680,26 @@ window.addEventListener('resize', () => {
   confettiCanvas.height = H;
 });
 
+// Обработка клика по экрану для отправки эмодзи, кроме исключений
+document.addEventListener('click', (e) => {
+  const ignoredIds = ['noteButton', 'counter', 'helpButton'];
+  const ignoredClasses = ['emojiChoice', 'modal', 'gift-box'];
+
+  let target = e.target;
+
+  // Проверка ID и class
+  const isIgnored = ignoredIds.includes(target.id) ||
+                    ignoredClasses.some(cls => target.classList.contains(cls)) ||
+                    target.closest('.modal') !== null;
+
+  if (!isIgnored) {
+    createRandomEmoji(e.clientX, e.clientY);
+    myTouches++;
+    updateCounter();
+    checkReward();
+    socket.emit('touch', { roomId });
+  }
+});
 
   </script>
 </body>
