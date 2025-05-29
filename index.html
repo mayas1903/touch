@@ -243,55 +243,69 @@ socket.on('connect', () => {
     window.addEventListener('resize', resizeCanvas);
 
     // Конфетти частицы
-    class ConfettiParticle {
-      constructor() {
-        this.x = Math.random() * confettiCanvas.width;
-        this.y = Math.random() * confettiCanvas.height - confettiCanvas.height;
-        this.size = (Math.random() * 6) + 4;
-        this.speed = (Math.random() * 3) + 2;
-        this.angle = Math.random() * 2 * Math.PI;
-        this.spin = (Math.random() * 0.1) + 0.01;
-        this.color = `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`;
-      }
-      update() {
-        this.y += this.speed;
-        this.x += Math.sin(this.angle) * 2;
-        this.angle += this.spin;
-        if (this.y > confettiCanvas.height) {
-          this.y = -10;
-          this.x = Math.random() * confettiCanvas.width;
-        }
-      }
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.ellipse(this.x, this.y, this.size * 0.6, this.size, this.angle, 0, 2 * Math.PI);
-        ctx.fill();
-      }
-    }
+   class ConfettiParticle {
+  constructor() {
+    this.x = Math.random() * confettiCanvas.width;
+    this.y = Math.random() * -confettiCanvas.height;
+    this.size = Math.random() * 8 + 4;
+    this.speedY = Math.random() * 2 + 1;
+    this.speedX = Math.random() * 2 - 1;
+    this.gravity = 0.05;
+    this.rotation = Math.random() * 2 * Math.PI;
+    this.rotationSpeed = Math.random() * 0.1 - 0.05;
+    this.opacity = 1;
+    this.fade = Math.random() * 0.01 + 0.005;
 
+    const colors = ['#FFC0CB', '#FFD700', '#00BFFF', '#ADFF2F', '#FF69B4', '#FFA500'];
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.speedY += this.gravity;
+    this.rotation += this.rotationSpeed;
+    this.opacity -= this.fade;
+  }
+
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size * 0.6); // прямоугольники
+    ctx.restore();
+  }
+
+  isVisible() {
+    return this.opacity > 0;
+  }
+}
     let confettiParticles = [];
 
-    function startConfetti() {
-      confettiParticles = [];
-      for (let i = 0; i < 150; i++) {
-        confettiParticles.push(new ConfettiParticle());
-      }
-      confettiCanvas.style.display = 'block';
-      animateConfetti();
-      setTimeout(stopConfetti, 4000);
-    }
+function startConfetti() {
+  confettiParticles = [];
+  for (let i = 0; i < 200; i++) {
+    confettiParticles.push(new ConfettiParticle());
+  }
+  confettiCanvas.style.display = 'block';
+  animateConfetti();
+}
 
     function animateConfetti() {
-      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      confettiParticles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      if (confettiParticles.length > 0) {
-        requestAnimationFrame(animateConfetti);
-      }
-    }
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiParticles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  confettiParticles = confettiParticles.filter(p => p.isVisible());
+  if (confettiParticles.length > 0) {
+    requestAnimationFrame(animateConfetti);
+  } else {
+    stopConfetti();
+  }
+}
 
     function stopConfetti() {
       confettiParticles = [];
