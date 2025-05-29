@@ -520,9 +520,10 @@ function handleTouch(x, y, target = null) {
     target.classList.contains('emojiChoice') ||
     target.closest('.modal') ||
     target.closest('.gift-box') ||
+    target.closest('#helpModal') ||
     target.closest('button')
   )) return;
-  if (target && (target.closest('#emojiSelector') || target.classList.contains('emojiChoice'))) return;
+  if (target && (target.closest('#emojiSelector') || target.closest('#helpModal') || target.classList.contains('emojiChoice'))) return;
   touchCooldown = true;
   setTimeout(() => (touchCooldown = false), 100);
   myTouches++;
