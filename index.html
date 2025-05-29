@@ -389,7 +389,7 @@ closeRewardBtn.onclick = () => {
   closeModal(rewardResultModal);
 const spinner = document.createElement('div');
   spinner.id = 'spinner';
-  spinner.style.fontSize = '48px';
+  spinner.style.fontSize = '42px';
   spinner.style.animation = 'spin 2s linear infinite';
   spinner.textContent = '⏳';
   spinner.style.position = 'fixed';
@@ -399,7 +399,7 @@ const spinner = document.createElement('div');
   spinner.style.zIndex = '1000';
 
   document.body.appendChild(spinner);
-
+stopConfetti();
   setTimeout(() => {
     spinner.remove();
     alert('Подарок активирован! 🎁');
