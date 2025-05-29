@@ -259,7 +259,7 @@
       requestAnimationFrame(update);
     }
 
-    function createRandomEmoji(x, y, emoji = '💗') {
+    function createRandomEmoji(x, y, emoji = ''💗', '💕', '💖', '💘', '💝', '💞') {
       const span = document.createElement('span');
       span.className = 'heart';
       span.textContent = emoji;
@@ -339,13 +339,18 @@
     }
 
     // Обработчик касания на странице
-    function handleTouch(x, y) {
-      myTouches++;
-      updateCounter();
-      createRandomEmoji(x, y);
-      sendTouch(x, y);
-      checkReward();
-    }
+    let touchCooldown = false;
+function handleTouch(x, y) {
+  if (touchCooldown) return;
+  touchCooldown = true;
+  setTimeout(() => (touchCooldown = false), 100); // Задержка между касаниями
+  myTouches++;
+  updateCounter();
+  createRandomEmoji(x, y);
+  sendTouch(x, y);
+  checkReward();
+}
+
 
     // Ловим touchstart и click (для десктопа)
     document.body.addEventListener('touchstart', e => {
