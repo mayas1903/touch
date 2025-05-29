@@ -694,19 +694,6 @@ window.addEventListener('resize', () => {
   confettiCanvas.width = W;
   confettiCanvas.height = H;
 });
-
-document.addEventListener('click', (e) => {
-  const target = e.target;
-  if (
-    target.closest('#counter') ||
-    target.closest('#emojiSelector') ||
-    target.closest('.emojiChoice') ||
-    target.closest('.modal') ||
-    target.closest('.gift-box') ||
-    target.closest('button')
-  ) return;
-  handleTouch(e.clientX, e.clientY, target);
-});
     
   </script>
 </body>
