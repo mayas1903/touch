@@ -287,11 +287,10 @@
     }
 const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
 
-    function createRandomEmoji(x, y, emoji) {
-      const fallbackEmojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
+    function createRandomEmoji(x, y, emoji = selectedEmoji) {
   const span = document.createElement('span');
   span.className = 'heart';
-  span.textContent = chosenEmoji;
+  span.textContent = emoji;
   span.style.left = (x - 20) + 'px';
   span.style.top = (y - 20) + 'px';
   document.body.appendChild(span);
