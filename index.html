@@ -576,6 +576,7 @@ document.body.addEventListener('pointerdown', e => {
 
  function startSakuraRain() {
    console.log('🌸 startSakuraRain запущен');
+   document.querySelectorAll('canvas').forEach(c => c.remove())
   const petals = [];
   const NUM_PETALS = 40;
   for (let i = 0; i < NUM_PETALS; i++) {
