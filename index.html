@@ -166,15 +166,6 @@
   </style>
 </head>
 <body>
-  
-  <div id="emojiSelector" style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">❤️</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🌸</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">✨</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💩</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💋</span>
-  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🔥</span>
-</div>
 
   <canvas id="confetti-canvas"></canvas>
   <p id="description" style="
@@ -202,6 +193,15 @@
       pointer-events: none;
     "></span>
   </p>
+
+  <div id="emojiSelector" style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">❤️</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🌸</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">✨</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💩</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">💋</span>
+  <span class="emojiChoice" style="cursor: pointer; font-size: 30px;">🔥</span>
+</div>
   
 <div id="pulseDots" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
   <svg width="80" height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -270,8 +270,6 @@
     let lastMyTouches = 0;
     let lastFriendTouches = 0;
     let rewardClaimed = false;
-
-    const emojis = ['💗', '💕', '💖', '💘', '💝', '💞'];
 
     function animateNumber(element, start, end, duration = 300) {
       const startTime = performance.now();
