@@ -435,10 +435,10 @@ document.body.addEventListener('touchstart', (e) => {
     rewardResultModal.classList.contains('show')
   ) return;
   
-const touch = e.touches[0];
-  createEmoji(e.clientX, e.clientY, '💗');
+  const touch = e.touches[0]; // Вот это твой палец
+  createEmoji(touch.clientX, touch.clientY, '💗');
   myTouches++;
-  socket.emit('touch', { roomId, x: e.clientX, y: e.clientY });
+  socket.emit('touch', { roomId, x: touch.clientX, y: touch.clientY });
   updateCounter();
   checkReward();
 
