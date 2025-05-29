@@ -133,7 +133,9 @@
 #rewardAvailableModal.show {
   animation: zoomInFromFar 0.6s ease forwards;
 }
-
+#spinner {
+  animation: spin 2s linear infinite;
+}
   /* Конфетти canvas */
   #confetti-canvas {
     position: fixed;
@@ -205,6 +207,7 @@
   <p id="rewardResultText">Вам выпал Telegram Premium на 3 месяца!</p>
   <button id="closeRewardBtn">Активировать</button>
 </div>
+  
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     // Переменные счётчиков
@@ -231,7 +234,7 @@ const closeRewardBtn = document.getElementById('closeRewardBtn');
 let lastMyTouches = 0;
 let lastFriendTouches = 0;
 
-function animateNumber(element, start, end, duration = 600) {
+function animateNumber(element, start, end, duration = 300) {
   const startTime = performance.now();
     updateProgressModal();
 
@@ -384,10 +387,23 @@ function stopConfetti() {
 closeProgressBtn.onclick = () => closeModal(progressModal);
 closeRewardBtn.onclick = () => {
   closeModal(rewardResultModal);
-  openModal(rewardLoadingModal);
- setTimeout(() => {
-    alert("Подарок активирован! 🎁");
-  }, 1000); // 1000 мс = 1 секунда
+const spinner = document.createElement('div');
+  spinner.id = 'spinner';
+  spinner.style.fontSize = '48px';
+  spinner.style.animation = 'spin 2s linear infinite';
+  spinner.textContent = '⏳';
+  spinner.style.position = 'fixed';
+  spinner.style.top = '50%';
+  spinner.style.left = '50%';
+  spinner.style.transform = 'translate(-50%, -50%)';
+  spinner.style.zIndex = '1000';
+
+  document.body.appendChild(spinner);
+
+  setTimeout(() => {
+    spinner.remove();
+    alert('Подарок активирован! 🎁');
+  }, 2000);
 };
 
 let rewardClaimed = false;
