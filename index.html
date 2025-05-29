@@ -191,7 +191,7 @@
 <div id="rewardResultModal" class="modal">
   <h2>Ура! 🎉</h2>
   <p id="rewardResultText">Вам выпал Telegram Premium на 3 месяца!</p>
-  <button id="closeRewardBtn">Закрыть</button>
+  <button id="closeRewardBtn">Активировать</button>
 </div>
 
   <canvas id="confetti-canvas"></canvas>
@@ -309,7 +309,10 @@ socket.on('connect', () => {
 
     // Закрытия по кнопкам
 closeProgressBtn.onclick = () => closeModal(progressModal);
-closeRewardBtn.onclick = () => closeModal(rewardResultModal);
+closeRewardBtn.onclick = () => {
+  closeModal(rewardResultModal);
+  alert("Подарок активирован! 🎁");
+};
 
 let rewardClaimed = false;
 
@@ -334,8 +337,7 @@ openRewardBtn.onclick = () => {
       "Звезды 500 штук",
     ];
     const gift = gifts[Math.floor(Math.random() * gifts.length)];
-
-    document.getElementById('rewardResultText').textContent = `Вам выпал ${gift}`;
+   document.getElementById('rewardResultText').innerHTML = `Вам выпало:<br><strong>${gift}</strong>`;
     openModal(rewardResultModal);
 
     startConfetti();
