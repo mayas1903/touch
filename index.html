@@ -470,9 +470,20 @@ document.querySelectorAll('.gift-box').forEach(box => {
   }, 2000);
 };
 
-    counter.addEventListener('click', () => {
-      openModal(progressModal);
-    });
+    function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+const counterHandler = () => {
+  openModal(progressModal);
+};
+if (isTouchDevice()) {
+  counter.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    counterHandler();
+  });
+} else {
+  counter.addEventListener('click', counterHandler);
+}
 
     // Подключаем Socket.IO
 const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
