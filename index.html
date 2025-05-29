@@ -39,47 +39,63 @@
   }
 
   /* Модалки */
-  .modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -60%);
-    background: #fff;
-    border-radius: 20px;
-    width: 270px;
-    max-width: 90vw;
-    padding: 18px 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    font-size: 15px;
-    color: #000;
-    text-align: center;
-    box-sizing: border-box;
-    user-select: none;
-    word-wrap: break-word;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
-  }
-  .modal.show {
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  background: #fefefe;
+  border-radius: 20px;
+  width: 270px;
+  max-width: 90vw;
+  padding: 20px 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  color: #111;
+  text-align: center;
+  box-sizing: border-box;
+  user-select: none;
+  word-wrap: break-word;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+  backdrop-filter: blur(10px);
+}
+
+.modal.show {
   opacity: 1;
   pointer-events: auto;
   transform: translate(-50%, -50%);
 }
-  .modal button {
-    margin-top: 15px;
-    background: #d6336c;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  .modal button:hover {
-    background: #b02753;
-  }
+
+.modal h2, .modal h3 {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.modal p {
+  margin: 6px 0;
+  line-height: 1.4;
+  color: #333;
+}
+
+.modal button {
+  margin-top: 18px;
+  background: #007aff;
+  border: none;
+  color: white;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.modal button:hover {
+  background: #005ecb;
+}
 
   /* Сердечки */
  .heart {
@@ -188,8 +204,9 @@
 
     // Элементы
     const counter = document.getElementById('counter');
-    const progressModal = document.getElementById('progressModal');
-    const giftModal = document.getElementById('giftModal');
+   const rewardAvailableModal = document.getElementById('rewardAvailableModal');
+const rewardLoadingModal = document.getElementById('rewardLoadingModal');
+const rewardResultModal = document.getElementById('rewardResultModal');
 
     const progressMy = document.getElementById('progressMy');
     const progressFriend = document.getElementById('progressFriend');
@@ -351,12 +368,14 @@ socket.on('showGift', () => {
     // Логика при клике по экрану (кроме счётчика)
    document.body.addEventListener('click', (e) => {
   if (e.target === counter) return;
-       if (
-    progressModal.classList.contains('show') ||
-    giftModal.classList.contains('show')
-  ) {
-    return; 
-  }
+    if (
+  progressModal.classList.contains('show') ||
+  rewardAvailableModal.classList.contains('show') ||
+  rewardLoadingModal.classList.contains('show') ||
+  rewardResultModal.classList.contains('show')
+) {
+  return; 
+}
   createEmoji(e.clientX, e.clientY, '💗'); // Твой смайлик — сердечко
   myTouches++;
   socket.emit('touch', { roomId, x: e.clientX, y: e.clientY });
