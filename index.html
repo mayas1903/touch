@@ -403,6 +403,14 @@ socket.on('connect', () => {
   createRandomEmoji(x, y, friendSelectedEmoji);
   checkReward();
 });
+    socket.on('touch', ({ x, y }) => {
+  friendTouches++;
+  updateCounter();
+  updateProgressModal();
+  createRandomEmoji(x, y, friendSelectedEmoji);
+  checkReward();
+});
+
 
     // Отправка касания на сервер
    function sendTouch(x, y) {
@@ -442,16 +450,6 @@ document.body.addEventListener('touchstart', e => {
 document.body.addEventListener('pointerdown', e => {
   if (e.target === counter) return;
   handleTouch(e.clientX, e.clientY);
-});
-
-    // Обработка данных от друга
-   socket.on('emojiSelected', ({ emoji }) => {
-  friendSelectedEmoji = emoji;
-  friendTouches++;
-  createRandomEmoji(x, y, friendSelectedEmoji);
- updateCounter();
-  updateProgressModal();
-  checkReward();
 });
 
     // Анимация конфетти
