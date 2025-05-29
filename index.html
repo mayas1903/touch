@@ -291,7 +291,7 @@
       counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
     }
 
-    ffunction updateProgressModal() {
+    function updateProgressModal() {
   progressMy.textContent = myTouches;
   progressFriend.textContent = friendTouches;
   totalTouches = myTouches + friendTouches;
@@ -349,23 +349,18 @@
 };
 
     counter.addEventListener('click', () => {
-      updateProgressModal();
       openModal(progressModal);
     });
 
     // Подключаем Socket.IO
-const socket = io('https://immense-fantasy-turret.glitch.me');
-
+const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
 const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe)
   ? window.Telegram.WebApp.initDataUnsafe.chat.id
-  : 'default_room'; 
-
+  : 'default_room';
+socket.emit('joinRoom', roomId);
 socket.on('connect', () => {
   console.log('🧠 Подключились к WebSocket-серверу');
-  // Сообщаем серверу, в какую комнату мы заходим
-  socket.emit('joinRoom', roomId);
 });
-
 
     // Отправка касания на сервер
     function sendTouch(x, y) {
@@ -402,8 +397,8 @@ function handleTouch(x, y) {
    socket.on('friendTouch', ({ x, y }) => {
   friendTouches++;
   createRandomEmoji(x, y, '💗'); // поменял createEmoji на createRandomEmoji
-  animateNumber(counter, lastMyTouches, myTouches);
-  lastFriendTouches = friendTouches;
+ animateNumber(counter, lastFriendTouches, friendTouches);
+lastFriendTouches = friendTouches;
   updateProgressModal();
   checkReward();
 });
