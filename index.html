@@ -574,17 +574,22 @@ document.body.addEventListener('pointerdown', e => {
   checkReward();
 });
 
- function startSakuraRain() {
+function startSakuraRain() {
   const NUM_PETALS = 40;
+  const svgMarkup = `
+    <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+      <path d="M25 0 C15 10, 5 25, 25 50 C45 25, 35 10, 25 0 Z" fill="#FFB6C1"/>
+    </svg>`;
+
   for (let i = 0; i < NUM_PETALS; i++) {
     const petal = document.createElement('div');
-    petal.innerHTML = '<img src="https://i.postimg.cc/hGx3qH3k/Chat-GPT-Image-30-2025-08-09-10.png" alt="petal" />';
-    const img = petal.querySelector('img');
+    petal.innerHTML = svgMarkup;
+    const svg = petal.querySelector('svg');
 
     const size = 20 + Math.random() * 20;
     const startX = Math.random() * window.innerWidth;
-    const startY = -50 - Math.random() * 50;
     const driftX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 30);
+    const startY = -50 - Math.random() * 50;
 
     petal.style.position = 'fixed';
     petal.style.left = `${startX}px`;
@@ -594,18 +599,20 @@ document.body.addEventListener('pointerdown', e => {
     petal.style.pointerEvents = 'none';
     petal.style.zIndex = 9999;
 
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.opacity = '0';
-    img.style.transition = 'opacity 1s ease';
-    img.style.animation = `sway ${3 + Math.random()}s ease-in-out infinite`;
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.style.opacity = '0';
+    svg.style.transition = 'opacity 1s ease';
+    svg.style.animation = `sway ${3 + Math.random()}s ease-in-out infinite`;
 
     document.body.appendChild(petal);
 
+    // Плавное появление
     setTimeout(() => {
-      img.style.opacity = '1';
+      svg.style.opacity = '1';
     }, 10);
 
+    // Анимация падения
     const duration = 4000;
     petal.animate([
       { transform: `translate(0px, 0px)`, opacity: 1 },
@@ -621,9 +628,6 @@ document.body.addEventListener('pointerdown', e => {
     }, duration + 200);
   }
 }
-
-    
-  startSakuraRain();
   </script>
 </body>
 </html>
