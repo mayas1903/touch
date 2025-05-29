@@ -342,6 +342,7 @@
     let touchCooldown = false;
 function handleTouch(x, y) {
   if (touchCooldown) return;
+   if (touchCooldown || isModalOpen) return;
   touchCooldown = true;
   setTimeout(() => (touchCooldown = false), 100); // Задержка между касаниями
   myTouches++;
