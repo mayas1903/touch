@@ -373,7 +373,7 @@ socket.on('connect', () => {
 function handleTouch(x, y) {
    if (touchCooldown || isModalOpen) return;
   touchCooldown = true;
-  setTimeout(() => (touchCooldown = false), 500); // Задержка между касаниями
+  setTimeout(() => (touchCooldown = false), 100); // Задержка между касаниями
   myTouches++;
   updateCounter();
   createRandomEmoji(x, y);
