@@ -314,9 +314,18 @@
 </div>
   
   <!-- Кнопка для создания записки -->
-<button id="noteButton" style="margin-top: 10px; padding: 10px 20px; border-radius: 12px; background: #ff69b4; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; font-style: italic;">
-  💌 Написать записку
-</button>
+<button id="noteButton" style="
+  margin-top: 8px;
+  margin-bottom: 6px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: #ff69b4;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+">💌 Написать записку</button>
 
 <!-- Модальное окно записи -->
 <div id="noteModal" class="modal" style="text-align: center;">
@@ -417,6 +426,8 @@
   let noteShown = false;
   let rewardClaimed = false;
   let selectedEmoji = '❤️';
+    let confettiWrappers = [];
+
 
   // --- ЭЛЕМЕНТЫ DOM ---
   const counter = document.getElementById('counter');
@@ -505,6 +516,7 @@ noteButton.onclick = () => openModal(noteModal);
   closeRewardBtn.onclick = () => {
     rewardClaimed = true;
     closeModal(rewardResultModal);
+    stopConfettiBurst();
     alert('Подарок активирован! 🎁');
   };
 
@@ -560,19 +572,23 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
     
   // --- ОБРАБОТЧИК КАСАНИЙ ---
   function handleTouch(x, y, target) {
-    if (touchCooldown || isModalOpen) return;
+  if (touchCooldown || isModalOpen) return;
+
   const forbidden = ['modal','emojiSelector','emojiChoice','gift-box'];
-if (
-  forbidden.some(cls => target.closest(`.${cls}`)) ||
-  ['counter','helpButton'].includes(target.id) ||
-  target.closest('button')
-) return;
-    touchCooldown = true;
-    setTimeout(() => touchCooldown = false, 100);
-   myTouches++;
-updateCounter();
-updateProgressModal();
-checkReward();
+  if (
+    forbidden.some(cls => target.closest(`.${cls}`)) ||
+    ['counter','helpButton'].includes(target.id) ||
+    target.closest('button')
+  ) return;
+
+  touchCooldown = true;
+  setTimeout(() => touchCooldown = false, 100);
+
+  myTouches++;
+  updateCounter();
+  updateProgressModal();
+  checkReward();
+
   // 🆕 Добавляем визуальный эмодзи
   const emoji = document.createElement('div');
   emoji.className = 'heart';
@@ -581,14 +597,21 @@ checkReward();
   emoji.style.top = `${y - 20}px`;
   document.body.appendChild(emoji);
   setTimeout(() => emoji.remove(), 1700);
+  // ✅ Отправляем данные другу по сокету
+  socket.emit('friendTouch', {
+    x,
+    y,
+    emoji: selectedEmoji
+  });
 }
+
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
 
   // --- WEBSOCKET + ЭМОДЗИ ---
   const socket = io('https://immense-fantasy-turret.glitch.me');
   const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
-  socket.emit('joinRoom', roomId);
-  socket.on('connect', () => {
+ socket.on('connect', () => {
+    socket.emit('joinRoom', roomId);
     document.querySelectorAll('.emojiChoice').forEach(el => {
       el.onclick = () => {
         selectedEmoji = el.textContent;
@@ -613,64 +636,83 @@ checkReward();
   setTimeout(() => emojiEl.remove(), 1700);
 });
 
+function stopConfettiBurst() {
+  confettiWrappers.forEach(el => el.remove());
+  confettiWrappers = [];
+}
+
 function startConfettiBurst() {
-  const NUM_STREAMERS = 300;
+  const NUM_CONFETTI = 400;
   const gradients = [
+    ['#ff3cac', '#784ba0'],
+    ['#f093fb', '#f5576c'],
+    ['#30cfd0', '#330867'],
     ['#f6d365', '#fda085'],
-    ['#84fab0', '#8fd3f4'],
-    ['#ffecd2', '#fcb69f'],
-    ['#a1c4fd', '#c2e9fb'],
     ['#fbc2eb', '#a6c1ee'],
     ['#ff9a9e', '#fad0c4'],
+    ['#84fab0', '#8fd3f4'],
+    ['#c2e9fb', '#a1c4fd'],
   ];
 
-  for (let i = 0; i < NUM_STREAMERS; i++) {
+  for (let i = 0; i < NUM_CONFETTI; i++) {
     const wrapper = document.createElement('div');
-    const grad = gradients[Math.floor(Math.random() * gradients.length)];
-    const gradId = `grad${i}-${Date.now()}`;
+    confettiWrappers.push(wrapper);
 
+    const grad = gradients[Math.floor(Math.random() * gradients.length)];
+    const gradId = `grad-${i}-${Date.now()}`;
     const svg = `
       <svg width="10" height="40" viewBox="0 0 10 40" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="${grad[0]}"/>
-            <stop offset="100%" stop-color="${grad[1]}"/>
+            <stop offset="0%" stop-color="${grad[0]}" />
+            <stop offset="100%" stop-color="${grad[1]}" />
           </linearGradient>
         </defs>
         <path d="M5,0 Q9,10 5,20 Q1,30 5,40" stroke="url(#${gradId})" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      </svg>`;
+      </svg>
+    `;
 
-    wrapper.innerHTML = svg;
-    const element = wrapper.firstElementChild;
+    function startConfettiBurst() {
+  const NUM_CONFETTI = 800;
+  const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
 
-    const size = 0.8 + Math.random() * 1.5;
+  for (let i = 0; i < NUM_CONFETTI; i++) {
+    const confetti = document.createElement('div');
+    const size = 6 + Math.random() * 10;
+    const color = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * window.innerWidth;
+    const startY = -100 - Math.random() * 200;
     const driftX = (Math.random() - 0.5) * 300;
-    const startY = -50 - Math.random() * 300;
-    const fallY = window.innerHeight + 100;
-    const rotation = Math.random() * 360;
+    const fallY = window.innerHeight + 300;
+    const rotateStart = Math.random() * 360;
+    const rotateEnd = rotateStart + 720;
 
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = `${startX}px`;
-    wrapper.style.top = `${startY}px`;
-    wrapper.style.transform = `scale(${size}) rotate(${rotation}deg)`;
-    wrapper.style.zIndex = '9999';
-    wrapper.style.pointerEvents = 'none';
+    confetti.style.position = 'fixed';
+    confetti.style.left = `${startX}px`;
+    confetti.style.top = `${startY}px`;
+    confetti.style.width = `${size}px`;
+    confetti.style.height = `${size}px`;
+    confetti.style.backgroundColor = color;
+    confetti.style.opacity = '1';
+    confetti.style.transform = `rotate(${rotateStart}deg)`;
+    confetti.style.zIndex = '9999';
+    confetti.style.pointerEvents = 'none';
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
 
-    document.body.appendChild(wrapper);
+    document.body.appendChild(confetti);
+    confettiWrappers.push(confetti);
 
-    wrapper.animate([
-      { transform: `translate(0, 0) rotate(${rotation}deg)`, opacity: 1 },
-      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotation + 360}deg)`, opacity: 0.2 }
+    confetti.animate([
+      { transform: `translate(0, 0) rotate(${rotateStart}deg)`, opacity: 1 },
+      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotateEnd}deg)`, opacity: 0.5 }
     ], {
       duration: 3000 + Math.random() * 1000,
-      easing: 'ease-out',
+      easing: 'cubic-bezier(0.3, 0.7, 0.4, 1)',
       fill: 'forwards'
     });
-
-    setTimeout(() => wrapper.remove(), 4000);
   }
 }
+
 
 
   </script>
