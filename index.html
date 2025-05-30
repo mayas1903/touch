@@ -204,7 +204,7 @@
 
 .emojiChoice {
   cursor: pointer;
-  font-size: 30px; /* уменьшено */
+  font-size: 28px; /* уменьшено */
   padding: 6px;
   margin: 2px;
   border-radius: 8px;
@@ -627,46 +627,32 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
 });
 
 function startConfettiBurst() {
-  const NUM_CONFETTI = 300;
+  const NUM_CONFETTI = 150;
   const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
 
   for (let i = 0; i < NUM_CONFETTI; i++) {
     const confetti = document.createElement('div');
-    const size = 6 + Math.random() * 8;
+    const size = 6 + Math.random() * 10;
     const color = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * window.innerWidth;
-    const startY = -30 - Math.random() * 50;
-    const driftX = (Math.random() - 0.5) * 200;
-    const fallY = window.innerHeight + 100;
-    const rotateStart = Math.random() * 360;
-    const rotateEnd = rotateStart + 360;
+    const delay = Math.random() * 2;
 
     confetti.style.position = 'fixed';
     confetti.style.left = `${startX}px`;
-    confetti.style.top = `${startY}px`;
+    confetti.style.top = `-40px`;
     confetti.style.width = `${size}px`;
-    confetti.style.height = `${size}px`;
+    confetti.style.height = `${size * 3}px`;
     confetti.style.backgroundColor = color;
-    confetti.style.opacity = '1';
-    confetti.style.transform = `rotate(${rotateStart}deg)`;
-    confetti.style.zIndex = '9999';
+    confetti.style.opacity = '0.8';
+    confetti.style.borderRadius = '2px';
     confetti.style.pointerEvents = 'none';
-    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    confetti.style.zIndex = '9999';
+    confetti.style.animation = `confettiFall 4s linear ${delay}s infinite`;
 
     document.body.appendChild(confetti);
-
-    confetti.animate([
-      { transform: `translate(0, 0) rotate(${rotateStart}deg)`, opacity: 1 },
-      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotateEnd}deg)`, opacity: 0 }
-    ], {
-      duration: 1800 + Math.random() * 500,
-      easing: 'ease-out',
-      fill: 'forwards'
-    });
-
-    setTimeout(() => confetti.remove(), 2200);
   }
 }
+
 
   </script>
 </body>
