@@ -542,6 +542,7 @@ document.querySelectorAll('.gift-box').forEach(box => {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 const counterHandler = () => {
+  updateProgressModal(); // ← обязательно перед открытием
   openModal(progressModal);
 };
 
