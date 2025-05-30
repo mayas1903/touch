@@ -21,6 +21,20 @@
       flex-direction: column;
       align-items: center;
     }
+
+    .heart {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      animation: floatUp 1.7s ease forwards;
+      opacity: 1;
+      z-index: 1000;
+      font-size: 35px;
+      line-height: 70px;
+      text-align: center;
+      user-select: none;
+    }
     
     #counter {
       font-size: 18px;
@@ -98,44 +112,39 @@
     }
 
 .gift-box {
-  font-size: 60px; /* ⬆️ Больше размер */
+  font-size: 60px;
   cursor: pointer;
-  transition: transform 0.3s ease, filter 0.3s ease;
   user-select: none;
+  transition: transform 0.3s ease, filter 0.3s ease;
   animation: pulseGift 2s infinite ease-in-out;
 }
+
 .gift-box:hover {
-  transform: scale(1.2);
-  filter: brightness(1.1);
+  transform: scale(1.2) rotate(-5deg);
+  filter: brightness(1.2);
 }
-.gift-box.opened {
-  animation: boxOpen 0.8s ease forwards;
-}
+
 /* 🔁 Пульсация */
 @keyframes pulseGift {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.1); }
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
 }
-/* 📦 Анимация открытия */
+/* 🎬 Анимация открытия коробки */
 @keyframes boxOpen {
   0%   { transform: scale(1) rotate(0deg); opacity: 1; }
-  50%  { transform: scale(1.5) rotate(15deg); }
-  100% {
+  50%  { transform: scale(1.4) rotate(10deg); }
+  100% { transform: scale(0) rotate(-30deg); opacity: 0; }
+}
+.gift-box.opened {
+  animation: boxOpen 0.6s ease forwards;
+}
 
-
-    .heart {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      pointer-events: none;
-      animation: floatUp 1.7s ease forwards;
-      opacity: 1;
-      z-index: 1000;
-      font-size: 35px;
-      line-height: 70px;
-      text-align: center;
-      user-select: none;
-    }
 
     @keyframes floatUp {
   0% {
