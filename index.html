@@ -534,7 +534,6 @@ noteButton.onclick = () => openModal(noteModal);
       </svg>
     `;
     document.body.appendChild(spinner);
-    openModal(rewardLoadingModal);
     setTimeout(() => {
       closeModal(document.getElementById('boxSelectionModal'));
       closeModal(rewardLoadingModal);
@@ -615,14 +614,14 @@ checkReward();
 });
 
 function startConfettiBurst() {
-  const NUM_CONFETTI = 200;
+  const NUM_CONFETTI = 300;
   const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
   for (let i = 0; i < NUM_CONFETTI; i++) {
     const confetti = document.createElement('div');
     const size = 6 + Math.random() * 8;
     const color = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * window.innerWidth;
-    const startY = window.innerHeight / 2 + Math.random() * 100 - 50;
+    const startY = -20 - Math.random() * 200;
     const rotate = Math.random() * 360;
     const driftX = (Math.random() - 0.5) * 300;
     const fallY = window.innerHeight + 100;
@@ -640,17 +639,15 @@ function startConfettiBurst() {
     document.body.appendChild(confetti);
     confetti.animate([
       { transform: `translate(0, 0) rotate(${rotate}deg)`, opacity: 1 },
-      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotate + 720}deg)`, opacity: 0 }
+      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotate + 720}deg)`, opacity: 0.6 }
     ], {
-      duration: 3000 + Math.random() * 1000,
-      easing: 'ease-out',
+      duration: 2500 + Math.random() * 1000,
+      easing: 'cubic-bezier(0.3, 0.7, 0.4, 1)',
       fill: 'forwards'
     });
-    setTimeout(() => confetti.remove(), 4200);
+    setTimeout(() => confetti.remove(), 4000);
   }
 }
-
-
   </script>
 </body>
 </html>
