@@ -489,8 +489,12 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   // --- ОБРАБОТЧИК КАСАНИЙ ---
   function handleTouch(x, y, target) {
     if (touchCooldown || isModalOpen) return;
-    const forbidden = ['modal','emojiSelector','emojiChoice','gift-box','button','counter','helpButton'];
-    if (forbidden.some(cls => target.closest(`.${cls}`) || target.id === cls)) return;
+  const forbidden = ['modal','emojiSelector','emojiChoice','gift-box'];
+if (
+  forbidden.some(cls => target.closest(`.${cls}`)) ||
+  ['counter','helpButton'].includes(target.id) ||
+  target.closest('button')
+) return;
     touchCooldown = true;
     setTimeout(() => touchCooldown = false, 100);
    myTouches++;
