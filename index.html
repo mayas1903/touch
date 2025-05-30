@@ -376,10 +376,10 @@
     const rewardLoadingModal = document.getElementById('rewardLoadingModal');
     const rewardResultModal = document.getElementById('rewardResultModal');
 
-    const progressMy = document.getElementById('progressMy');
-    const progressFriend = document.getElementById('progressFriend');
-    const progressTotal = document.getElementById('progressTotal');
-    const progressLeft = document.getElementById('progressLeft');
+    const progressSummary = document.getElementById('progressSummary');
+const progressText = document.getElementById('progressText');
+const myProgress = document.getElementById('myProgress');
+const friendProgress = document.getElementById('friendProgress');
 
     const closeProgressBtn = document.getElementById('closeProgressBtn');
     const openRewardBtn = document.getElementById('openRewardBtn');
@@ -459,13 +459,13 @@ const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
 
     function updateProgressModal() {
   totalTouches = myTouches + friendTouches;
-  document.getElementById('progressSummary').textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
-  document.getElementById('progressText').textContent = `${totalTouches} / 1000`;
+  progressSummary.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+  progressText.textContent = `${totalTouches} / 1000`;
   const max = 1000;
   const myPercent = Math.min((myTouches / max) * 100, 100);
   const friendPercent = Math.min((friendTouches / max) * 100, 100);
-  document.getElementById('myProgress').style.width = myPercent + '%';
-  document.getElementById('friendProgress').style.width = friendPercent + '%';
+  myProgress.style.width = myPercent + '%';
+  friendProgress.style.width = friendPercent + '%';
 }
 
     function openModal(modal) {
@@ -545,6 +545,14 @@ const counterHandler = () => {
   updateProgressModal(); // ← обязательно перед открытием
   openModal(progressModal);
 };
+    if (isTouchDevice()) {
+  counter.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    counterHandler();
+  });
+} else {
+  counter.addEventListener('click', counterHandler);
+}
 
     // Подключаем Socket.IO
 const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
