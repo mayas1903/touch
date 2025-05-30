@@ -370,26 +370,10 @@
   let totalTouches = 0;
   let touchCooldown = false;
   let isModalOpen = false;   // <-- объявляем перед использованием
-
   let savedNote = null;
   let noteThreshold = 0;
   let noteShown = false;
   let rewardClaimed = false;
-
-  let selectedEmoji = '❤️';
-
-  // --- ЭЛЕМЕНТЫ DOM ---
-let myTouches = 0;
-  let friendTouches = 0;
-  let totalTouches = 0;
-  let touchCooldown = false;
-  let isModalOpen = false;   // <-- объявляем перед использованием
-
-  let savedNote = null;
-  let noteThreshold = 0;
-  let noteShown = false;
-  let rewardClaimed = false;
-
   let selectedEmoji = '❤️';
 
   // --- ЭЛЕМЕНТЫ DOM ---
@@ -484,6 +468,24 @@ let myTouches = 0;
 
   counter.onclick = () => openModal(progressModal);
 
+    document.querySelectorAll('.gift-box').forEach(box => {
+  box.addEventListener('click', () => {
+    closeModal(document.getElementById('boxSelectionModal'));
+    const reward = 'Telegram Premium на 3 месяца!'; // Можешь добавить случайный выбор
+    document.getElementById('rewardResultText').textContent = `Вам выпал ${reward}`;
+    openModal(rewardResultModal);
+  });
+});
+
+    // Выбор emoji
+document.querySelectorAll('.emojiChoice').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedEmoji = el.textContent;
+  });
+});
+    
   // --- ОБРАБОТЧИК КАСАНИЙ ---
   function handleTouch(x, y, target) {
     if (touchCooldown || isModalOpen) return;
@@ -491,10 +493,10 @@ let myTouches = 0;
     if (forbidden.some(cls => target.closest(`.${cls}`) || target.id === cls)) return;
     touchCooldown = true;
     setTimeout(() => touchCooldown = false, 100);
-    myTouches++;
-    updateCounter();
-    // анимация и отправка на сервер...
-    checkReward();
+   myTouches++;
+updateCounter();
+updateProgressModal();
+checkReward();
   }
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
 
