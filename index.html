@@ -364,268 +364,146 @@
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
-    let myTouches = 0;
-    let selectedEmoji = '❤️';
-    
-    let friendTouches = 0;
-    let totalTouches = 0;
+    // --- ОБЩИЕ ПЕРЕМЕННЫЕ ---
+  let myTouches = 0;
+  let friendTouches = 0;
+  let totalTouches = 0;
+  let touchCooldown = false;
+  let isModalOpen = false;   // <-- объявляем перед использованием
 
-    const counter = document.getElementById('counter');
-    const progressModal = document.getElementById('progressModal');
-    const rewardAvailableModal = document.getElementById('rewardAvailableModal');
-    const rewardLoadingModal = document.getElementById('rewardLoadingModal');
-    const rewardResultModal = document.getElementById('rewardResultModal');
+  let savedNote = null;
+  let noteThreshold = 0;
+  let noteShown = false;
+  let rewardClaimed = false;
 
-    const progressSummary = document.getElementById('progressSummary');
-const progressText = document.getElementById('progressText');
-const myProgress = document.getElementById('myProgress');
-const friendProgress = document.getElementById('friendProgress');
+  let selectedEmoji = '❤️';
 
-    const closeProgressBtn = document.getElementById('closeProgressBtn');
-    const openRewardBtn = document.getElementById('openRewardBtn');
-    const closeRewardBtn = document.getElementById('closeRewardBtn');
+  // --- ЭЛЕМЕНТЫ DOM ---
+  const counter = document.getElementById('counter');
+  const progressModal = document.getElementById('progressModal');
+  const rewardAvailableModal = document.getElementById('rewardAvailableModal');
+  const rewardLoadingModal = document.getElementById('rewardLoadingModal');
+  const rewardResultModal = document.getElementById('rewardResultModal');
+  const noteModal = document.getElementById('noteModal');
+  const noteRevealModal = document.getElementById('noteRevealModal');
 
-    let lastMyTouches = 0;
-    let lastFriendTouches = 0;
-    let rewardClaimed = false;
+  const progressSummary = document.getElementById('progressSummary');
+  const progressText    = document.getElementById('progressText');
+  const myProgress      = document.getElementById('myProgress');
+  const friendProgress  = document.getElementById('friendProgress');
 
-    let savedNote = null;
-let noteThreshold = 0;
-let noteShown = false;
-    const noteModal = document.getElementById('noteModal');
-const noteButton = document.getElementById('noteButton');
-const saveNoteBtn = document.getElementById('saveNoteBtn');
-const noteText = document.getElementById('noteText');
-const noteThresholdInput = document.getElementById('noteThreshold');
-const noteRevealModal = document.getElementById('noteRevealModal');
-const revealedNoteText = document.getElementById('revealedNoteText');
+  const closeProgressBtn = document.getElementById('closeProgressBtn');
+  const openRewardBtn    = document.getElementById('openRewardBtn');
+  const closeRewardBtn   = document.getElementById('closeRewardBtn');
+  const saveNoteBtn      = document.getElementById('saveNoteBtn');
+  const noteTextElm      = document.getElementById('noteText');
+  const noteThresholdEl  = document.getElementById('noteThreshold');
 
-// Открытие модального окна записки
-noteButton.onclick = () => {
-  openModal(noteModal);
-};
+  const helpButton = document.getElementById('helpButton');
+  const helpModal   = document.getElementById('helpModal');
 
-// Сохраняем записку и порог
-saveNoteBtn.onclick = () => {
-  const text = noteText.value.trim();
-  const threshold = parseInt(noteThresholdInput.value, 10);
-  if (text && threshold > 0) {
-    savedNote = text;
-    noteThreshold = threshold;
-    closeModal(noteModal);
-    alert(`✉️ Записка сохранена. Покажется при ${threshold} касаниях.`);
+  // --- ФУНКЦИИ МОДАЛОК ---
+  function openModal(modal) {
+    updateProgressModal();  // гарантируем, что перед прогрессом всё обновлено
+    isModalOpen = true;
+    modal.classList.add('show');
   }
-};
+  function closeModal(modal) {
+    isModalOpen = false;
+    modal.classList.remove('show');
+  }
 
-    function animateNumber(element, start, end, duration = 300) {
-      const startTime = performance.now();
+  // --- ОБНОВЛЕНИЕ СЧЁТЧИКА И ПРОГРЕССА ---
+  function updateCounter() {
+    counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+  }
+  function updateProgressModal() {
+    totalTouches = myTouches + friendTouches;
+    progressSummary.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+    progressText.textContent    = `${totalTouches} / 1000`;
+    const max = 1000;
+    myProgress.style.width     = `${Math.min(myTouches / max * 100, 100)}%`;
+    friendProgress.style.width = `${Math.min(friendTouches / max * 100, 100)}%`;
+  }
 
-      function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const currentValue = Math.floor(start + (end - start) * progress);
-        element.textContent = currentValue;
-        if (progress < 1) {
-          requestAnimationFrame(update);
-        }
-      }
-      requestAnimationFrame(update);
+  // --- ОБРАБОТКА ЗАПИСОК И ПОДАРКОВ ---
+  saveNoteBtn.onclick = () => {
+    const text = noteTextElm.value.trim();
+    const thr  = parseInt(noteThresholdEl.value, 10);
+    if (text && thr > 0) {
+      savedNote    = text;
+      noteThreshold = thr;
+      closeModal(noteModal);
+      alert(`✉️ Записка сохранена. Появится при ${thr} касаниях.`);
     }
+  };
 
-const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
-
-    function createRandomEmoji(x, y, emoji = selectedEmoji) {
-  const span = document.createElement('span');
-  span.className = 'heart';
-  span.textContent = emoji;
-  span.style.left = (x - 20) + 'px';
-  span.style.top = (y - 20) + 'px';
-  document.body.appendChild(span);
-  setTimeout(() => {
-    span.remove();
-  }, 1700);
-}
-
-    function updateCounter() {
-      counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+  function checkReward() {
+    totalTouches = myTouches + friendTouches;
+    if (totalTouches >= 10 && !rewardClaimed) {
+      openModal(rewardAvailableModal);
     }
-
-    function updateProgressModal() {
-  totalTouches = myTouches + friendTouches;
-  progressSummary.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
-  progressText.textContent = `${totalTouches} / 1000`;
-  const max = 1000;
-  const myPercent = Math.min((myTouches / max) * 100, 100);
-  const friendPercent = Math.min((friendTouches / max) * 100, 100);
-  myProgress.style.width = myPercent + '%';
-  friendProgress.style.width = friendPercent + '%';
-}
-    
-let touchCooldown = false;
-let isModalOpen = false;
-
-    function openModal(modal) {
-  isModalOpen = true;  // НЕТ ОБЪЯВЛЕНИЯ
-  modal.classList.add('show');
-}
-function closeModal(modal) {
-  isModalOpen = false; // НЕТ ОБЪЯВЛЕНИЯ
-  modal.classList.remove('show');
-}
-
-    const helpButton = document.getElementById('helpButton');
-const helpModal = document.getElementById('helpModal');
-
-helpButton.addEventListener('click', () => {
-  openModal(helpModal);
-});
-    function checkReward() {
-      totalTouches = myTouches + friendTouches;
-      if (totalTouches >= 10 && !rewardAvailableModal.classList.contains('show') && !rewardClaimed) {
-        openModal(rewardAvailableModal);
-      }
-      if (savedNote && totalTouches >= noteThreshold && !noteShown) {
-    revealedNoteText.textContent = savedNote;
-    openModal(noteRevealModal);
-    noteShown = true;
+    if (savedNote && totalTouches >= noteThreshold && !noteShown) {
+      document.getElementById('revealedNoteText').textContent = savedNote;
+      openModal(noteRevealModal);
+      noteShown = true;
+    }
   }
-  }
-      
-    closeProgressBtn.onclick = () => closeModal(progressModal);
-    openRewardBtn.onclick = () => {
-      closeModal(rewardAvailableModal);
-      openModal(rewardLoadingModal);
-      setTimeout(() => {
-        closeModal(rewardLoadingModal);
-        openBoxSelection();
-      }, 2000);
-    };
 
-    const boxSelectionModal = document.getElementById('boxSelectionModal');
-
-function openBoxSelection() {
-  openModal(boxSelectionModal);
-}
-document.querySelectorAll('.gift-box').forEach(box => {
-  box.addEventListener('click', () => {
-    box.classList.add('opened');
+  // --- ОБРАБОТКА КНОПОК И СОБЫТИЙ ---
+  closeProgressBtn.onclick = () => closeModal(progressModal);
+  openRewardBtn.onclick    = () => {
+    closeModal(rewardAvailableModal);
+    openModal(rewardLoadingModal);
     setTimeout(() => {
-      closeModal(boxSelectionModal);
-      showRandomReward(); // Показываем награду после анимации
-    }, 700);
-  });
-});
-    function showRandomReward() {
-  const gifts = [
-    'Telegram Premium на 3 месяца!',
-    'Telegram Premium на 1 месяц!',
-    'Звезды 250 штук!',
-    'Звезды 500 штук!',
-  ];
-  const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
-  document.getElementById('rewardResultText').innerHTML = `Вам выпало:<br><strong>${randomGift}</strong>`;
-  openModal(rewardResultModal);
-  startSakuraRain(); // 🌸 тут новая магия
-}
-
-    closeRewardBtn.onclick = () => {
-      rewardClaimed = true;
-      closeModal(rewardResultModal);
-      const pulse = document.getElementById('pulseDots');
-  pulse.style.display = 'block';
-       setTimeout(() => {
-    pulse.style.display = 'none';
+      closeModal(rewardLoadingModal);
+      openModal(document.getElementById('boxSelectionModal'));
+    }, 2000);
+  };
+  closeRewardBtn.onclick = () => {
+    rewardClaimed = true;
+    closeModal(rewardResultModal);
     alert('Подарок активирован! 🎁');
-  }, 2000);
-};
+  };
 
-    function isTouchDevice() {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-}
-const counterHandler = () => {
-  updateProgressModal(); // ← обязательно перед открытием
-  openModal(progressModal);
-};
-    if (isTouchDevice()) {
-  counter.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    counterHandler();
+  helpButton.onclick = () => openModal(helpModal);
+
+  counter.onclick = () => openModal(progressModal);
+
+  // --- ОБРАБОТЧИК КАСАНИЙ ---
+  function handleTouch(x, y, target) {
+    if (touchCooldown || isModalOpen) return;
+    const forbidden = ['modal','emojiSelector','emojiChoice','gift-box','button','counter','helpButton'];
+    if (forbidden.some(cls => target.closest(`.${cls}`) || target.id === cls)) return;
+    touchCooldown = true;
+    setTimeout(() => touchCooldown = false, 100);
+    myTouches++;
+    updateCounter();
+    // анимация и отправка на сервер...
+    checkReward();
+  }
+  document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
+
+  // --- WEBSOCKET + ЭМОДЗИ ---
+  const socket = io('https://immense-fantasy-turret.glitch.me');
+  const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
+  socket.emit('joinRoom', roomId);
+  socket.on('connect', () => {
+    document.querySelectorAll('.emojiChoice').forEach(el => {
+      el.onclick = () => {
+        selectedEmoji = el.textContent;
+        document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+      };
+    });
+    document.querySelectorAll('.emojiChoice')[0].classList.add('selected');
   });
-} else {
-  counter.addEventListener('click', counterHandler);
-}
-
-    // Подключаем Socket.IO
-const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
-const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe)
-  ? window.Telegram.WebApp.initDataUnsafe.chat.id
-  : 'default_room';
-socket.emit('joinRoom', roomId);
-socket.on('connect', () => {
-  document.querySelectorAll('.emojiChoice').forEach(el => {
-  el.addEventListener('click', () => {
-    selectedEmoji = el.textContent;
-    document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
-    el.classList.add('selected');
+  socket.on('friendTouch', ({x, y, emoji}) => {
+    friendTouches++;
+    updateCounter();
+    updateProgressModal();
+    checkReward();
   });
-});
-// По умолчанию выделяем первый эмодзи
-document.querySelectorAll('.emojiChoice')[0].classList.add('selected');
-});
-  document.querySelectorAll('.emojiChoice')[0].style.opacity = '1';
-console.log('🧠 Подключились к WebSocket-серверу');
-});
-
-    // Отправка касания на сервер
-   function sendTouch(x, y) {
-  socket.emit('touch', { roomId, x, y, emoji: selectedEmoji });
-}
-    
-    function handleTouch(x, y, target = null) {
-  if (touchCooldown || isModalOpen) return;
-  const shouldIgnore = target && (
-    target.closest('.modal') ||
-    target.closest('#emojiSelector') ||
-    target.closest('.emojiChoice') ||
-    target.closest('.gift-box') ||
-    target.closest('button') ||
-    target.closest('#counter') ||
-    target.closest('#helpButton')
-  );
-  if (shouldIgnore) return;
-  touchCooldown = true;
-  setTimeout(() => (touchCooldown = false), 100);
-  myTouches++;
-  updateCounter(); // 💡 обновляет счётчик на экране
-  createRandomEmoji(x, y, selectedEmoji);
-  sendTouch(x, y);
-  checkReward();
-}
-
-    // Ловим touchstart и click (для десктопа)
-    let ignoreClick = false;
-
-document.body.addEventListener('pointerdown', e => {
-  const target = e.target;
-  if (
-    target.closest('#counter') ||
-    target.closest('#emojiSelector') ||
-    target.closest('.emojiChoice') ||
-    target.closest('.modal') ||
-    target.closest('.gift-box') ||
-    target.closest('button')
-  ) return;
-  handleTouch(e.clientX, e.clientY, target);
-});
-
-    // Обработка данных от друга
-   socket.on('friendTouch', ({ x, y, emoji }) => {
-  friendTouches++;
-  createRandomEmoji(x, y, emoji );
-  updateCounter();
-  updateProgressModal();
-  checkReward();
-});
 
 function startSakuraRain() {
   const NUM_PETALS = 40;
