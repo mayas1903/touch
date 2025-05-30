@@ -196,6 +196,54 @@
   75%  { transform: translateX(5px) rotate(5deg); }
   100% { transform: translateX(0px) rotate(0deg); }
 }
+.dual-progress-container {
+  width: 100%;
+  height: 20px;
+  background: #fefefe;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  margin-top: 12px;
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.progress-part {
+  height: 100%;
+  transition: width 0.5s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.my-part {
+  background: linear-gradient(135deg, #ff69b4, #ff1493);
+}
+
+.friend-part {
+  background: linear-gradient(135deg, #87cefa, #1e90ff);
+}
+
+.my-part::before,
+.friend-part::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: inherit;
+  border-radius: 50%;
+  animation: waveMotion 4s infinite linear;
+  opacity: 0.3;
+  transform: translateY(0) scaleX(1.5);
+  z-index: 0;
+}
+
+@keyframes waveMotion {
+  0%   { transform: translateX(0) translateY(0) scaleX(1.5); }
+  50%  { transform: translateX(-25%) translateY(-5%) scaleX(1.5); }
+  100% { transform: translateX(0) translateY(0) scaleX(1.5); }
+}
 
   </style>
 </head>
@@ -285,14 +333,17 @@
   
   <div id="counter" role="button" aria-label="Счётчик касаний">Ты: 0 | Друг: 0</div>
   
-  <div id="progressModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="progressTitle" aria-describedby="progressDesc">
-    <h3 id="progressTitle">💖 Ваш прогресс</h3>
-    <p>Ты: <span id="progressMy">0</span></p>
-    <p>Друг: <span id="progressFriend">0</span></p>
-    <p>Всего: <span id="progressTotal">0</span></p>
-    <p>До подарка осталось: <span id="progressLeft">1000</span></p>
-    <button id="closeProgressBtn">Ок</button>
+  <div id="progressModal" class="modal" role="dialog" aria-modal="true">
+  <h3 id="progressTitle">💖 Ваш прогресс</h3>
+  <p id="progressSummary">Ты: 0 | Друг: 0</p>
+  <div class="dual-progress-container">
+    <div id="myProgress" class="progress-part my-part"></div>
+    <div id="friendProgress" class="progress-part friend-part"></div>
   </div>
+  <p style="margin-top: 8px; font-size: 16px; color: #888;" id="progressText">0 / 1000</p>
+  <button id="closeProgressBtn">Ок</button>
+</div>
+
 
   <div id="rewardAvailableModal" class="modal">
     <h2>🎉 Поздравляем!</h2>
@@ -407,12 +458,16 @@ const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
     }
 
     function updateProgressModal() {
-  progressMy.textContent = myTouches;
-  progressFriend.textContent = friendTouches;
   totalTouches = myTouches + friendTouches;
-  progressTotal.textContent = totalTouches;
-  progressLeft.textContent = Math.max(1000 - totalTouches, 0);
+  document.getElementById('progressSummary').textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+  document.getElementById('progressText').textContent = `${totalTouches} / 1000`;
+  const max = 1000;
+  const myPercent = Math.min((myTouches / max) * 100, 100);
+  const friendPercent = Math.min((friendTouches / max) * 100, 100);
+  document.getElementById('myProgress').style.width = myPercent + '%';
+  document.getElementById('friendProgress').style.width = friendPercent + '%';
 }
+
     function openModal(modal) {
       isModalOpen = true;
       modal.classList.add('show');
