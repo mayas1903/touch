@@ -507,7 +507,6 @@ noteButton.onclick = () => openModal(noteModal);
   // --- ОБРАБОТКА КНОПОК И СОБЫТИЙ ---
   closeProgressBtn.onclick = () => closeModal(progressModal);
   openRewardBtn.onclick    = () => {
-    if (rewardClaimed) return;
     closeModal(rewardAvailableModal);
     openModal(rewardLoadingModal);
     setTimeout(() => {
