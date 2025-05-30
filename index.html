@@ -9,7 +9,7 @@
       position: relative;
       margin: 0;
       padding: 20px;
-      background-image: url('https://i.postimg.cc/xdfHJk7x/042-FACF6-1710-454-B-84-F0-C2-D64859-AD77.jpg');
+     background-color: white;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
         Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -314,23 +314,37 @@
 </div>
   
   <!-- Кнопка для создания записки -->
-<button id="noteButton" style="margin-top: 10px; padding: 10px 20px; border-radius: 12px; background: #ff69b4; color: white; border: none; font-size: 16px; cursor: pointer;">💌 Написать записку</button>
+<button id="noteButton" style="margin-top: 10px; padding: 10px 20px; border-radius: 12px; background: #ff69b4; color: white; border: none; font-size: 16px; cursor: pointer; font-weight: bold; font-style: italic;">
+  💌 Написать записку
+</button>
 
 <!-- Модальное окно записи -->
-<div id="noteModal" class="modal">
-  <h3>Оставить записку</h3>
-  <textarea id="noteText" maxlength="140" rows="4" placeholder="Введите записку..." style="width: 100%; border-radius: 8px; padding: 8px;"></textarea>
-  <p style="margin-top: 10px;">Показать, когда достигнуто:</p>
-  <input id="noteThreshold" type="number" min="1" max="10000" value="50" style="width: 100%; padding: 8px; border-radius: 8px;" />
-  <div style="margin-top: 16px;">
+<div id="noteModal" class="modal" style="text-align: center;">
+  <h3 style="margin-bottom: 16px;">✍🏼 Оставить записку:</h3>
+  <textarea
+    id="noteText"
+    maxlength="140"
+    rows="4"
+    placeholder="Введите записку..."
+    style="width: 100%; max-width: 100%; padding: 10px; border-radius: 10px; resize: none; box-sizing: border-box;"
+  ></textarea>Отправить, когда достигнуто:</p>
+  <input
+    id="noteThreshold"
+    type="number"
+    min="1"
+    max="10000"
+    value="50"
+    style="width: 100%; max-width: 100%; padding: 10px; border-radius: 10px; box-sizing: border-box;"
+  />
+  <div style="margin-top: 20px; display: flex; justify-content: center; gap: 12px;">
     <button id="saveNoteBtn">Сохранить</button>
-    <button onclick="closeModal(noteModal)" style="margin-left: 10px; background: #ccc; color: #333;">Закрыть</button>
+    <button onclick="closeModal(noteModal)" style="background: #ccc; color: #333;">Закрыть</button>
   </div>
 </div>
 
 <!-- Модальное окно показа записки -->
 <div id="noteRevealModal" class="modal">
-  <h3>📩 Сообщение</h3>
+  <h3>📩 Вам сообщение:</h3>
   <p id="revealedNoteText"></p>
   <button onclick="closeModal(noteRevealModal)">Ок</button>
 </div>
@@ -501,12 +515,32 @@ noteButton.onclick = () => openModal(noteModal);
   box.addEventListener('click', () => {
     document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
     box.classList.add('opened');
+    const spinner = document.createElement('div');
+    spinner.id = 'customSpinner';
+    spinner.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20000;
+    `;
+    spinner.innerHTML = `
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
+        <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
+          stroke-dasharray="164.93361431346415 56.97787143782138">
+          <animateTransform attributeName="transform" type="rotate"
+            repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
+        </circle>
+      </svg>
+    `;
+    document.body.appendChild(spinner);
     openModal(rewardLoadingModal);
     setTimeout(() => {
       closeModal(document.getElementById('boxSelectionModal'));
       closeModal(rewardLoadingModal);
       document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
-      startSakuraRain();
+      document.getElementById('customSpinner')?.remove();
+      startConfettiBurst();
       openModal(rewardResultModal);
       document.querySelectorAll('.gift-box').forEach(b => {
         b.classList.remove('opened');
@@ -580,58 +614,39 @@ checkReward();
   setTimeout(() => emojiEl.remove(), 1700);
 });
 
-function startSakuraRain() {
-  const NUM_PETALS = 340;
-  const svgMarkup = `
-    <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-      <path d="M25 0 C15 10, 5 25, 25 50 C45 25, 35 10, 25 0 Z" fill="#FFB6C1"/>
-    </svg>`;
-
-  // 🌬️ Настроим направление ветра:
-  const windDirection = Math.random() > 0.5 ? 1 : -1; // 1 = вправо, -1 = влево
-  const windStrength = 60 + Math.random() * 60; // от 60 до 120 px
-  const baseWind = windDirection * windStrength;
-
-  for (let i = 0; i < NUM_PETALS; i++) {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = svgMarkup;
-    const svg = wrapper.querySelector('svg');
-
-    const size = 20 + Math.random() * 20;
+function startConfettiBurst() {
+  const NUM_CONFETTI = 200;
+  const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
+  for (let i = 0; i < NUM_CONFETTI; i++) {
+    const confetti = document.createElement('div');
+    const size = 6 + Math.random() * 8;
+    const color = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * window.innerWidth;
-    const driftVariance = (Math.random() - 0.5) * 40; // немного "разброса"
-    const driftX = baseWind + driftVariance;
-    const startY = -50 - Math.random() * 100;
-
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = `${startX}px`;
-    wrapper.style.top = `${startY}px`;
-    wrapper.style.width = `${size}px`;
-    wrapper.style.height = `${size}px`;
-    wrapper.style.pointerEvents = 'none';
-    wrapper.style.zIndex = '9999';
-    wrapper.style.transform = 'translate(0, 0)';
-
-    svg.style.width = '100%';
-    svg.style.height = '100%';
-    svg.style.opacity = '1';
-    svg.style.transition = 'opacity 1s ease';
-    svg.style.animation = `sway ${3 + Math.random() * 2}s ease-in-out infinite`;
-
-    document.body.appendChild(wrapper);
-    const fallDistance = window.innerHeight - startY + 100;
-    const delay = Math.random() * 1500;
-    setTimeout(() => {
-      wrapper.animate([
-        { transform: 'translate(0, 0)', opacity: 1 },
-        { transform: `translate(${driftX}px, ${fallDistance}px)`, opacity: 0 }
-      ], {
-        duration: 4000,
-        easing: 'ease-in-out',
-        fill: 'forwards'
-      })
-      setTimeout(() => wrapper.remove(), 4200);
-    }, delay);
+    const startY = window.innerHeight / 2 + Math.random() * 100 - 50;
+    const rotate = Math.random() * 360;
+    const driftX = (Math.random() - 0.5) * 300;
+    const fallY = window.innerHeight + 100;
+    confetti.style.position = 'fixed';
+    confetti.style.left = `${startX}px`;
+    confetti.style.top = `${startY}px`;
+    confetti.style.width = `${size}px`;
+    confetti.style.height = `${size}px`;
+    confetti.style.backgroundColor = color;
+    confetti.style.opacity = '1';
+    confetti.style.transform = `rotate(${rotate}deg)`;
+    confetti.style.zIndex = '9999';
+    confetti.style.pointerEvents = 'none';
+    confetti.style.borderRadius = '2px';
+    document.body.appendChild(confetti);
+    confetti.animate([
+      { transform: `translate(0, 0) rotate(${rotate}deg)`, opacity: 1 },
+      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotate + 720}deg)`, opacity: 0 }
+    ], {
+      duration: 3000 + Math.random() * 1000,
+      easing: 'ease-out',
+      fill: 'forwards'
+    });
+    setTimeout(() => confetti.remove(), 4200);
   }
 }
 
