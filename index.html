@@ -322,7 +322,10 @@
   <textarea id="noteText" maxlength="140" rows="4" placeholder="Введите записку..." style="width: 100%; border-radius: 8px; padding: 8px;"></textarea>
   <p style="margin-top: 10px;">Показать, когда достигнуто:</p>
   <input id="noteThreshold" type="number" min="1" max="10000" value="50" style="width: 100%; padding: 8px; border-radius: 8px;" />
-  <button id="saveNoteBtn">Сохранить</button>
+  <div style="margin-top: 16px;">
+    <button id="saveNoteBtn">Сохранить</button>
+    <button onclick="closeModal(noteModal)" style="margin-left: 10px; background: #ccc; color: #333;">Закрыть</button>
+  </div>
 </div>
 
 <!-- Модальное окно показа записки -->
@@ -424,6 +427,8 @@
 
   const helpButton = document.getElementById('helpButton');
   const helpModal   = document.getElementById('helpModal');
+const noteButton = document.getElementById('noteButton');
+noteButton.onclick = () => openModal(noteModal);
 
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
@@ -494,23 +499,20 @@
     
     document.querySelectorAll('.gift-box').forEach(box => {
   box.addEventListener('click', () => {
-    // Отключаем выбор, чтобы не кликали по другим
     document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
-    // Запускаем анимацию
     box.classList.add('opened');
-    // ⏳ Ждём завершения анимации
+    openModal(rewardLoadingModal);
     setTimeout(() => {
       closeModal(document.getElementById('boxSelectionModal'));
-      const reward = 'Telegram Premium на 3 месяца!'; // Можешь добавить рандом
-      document.getElementById('rewardResultText').textContent = `Вам выпал ${reward}`;
-      startSakuraRain(); // 🌸
+      closeModal(rewardLoadingModal);
+      document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
+      startSakuraRain();
       openModal(rewardResultModal);
-      // Возвращаем состояние (на всякий случай)
       document.querySelectorAll('.gift-box').forEach(b => {
         b.classList.remove('opened');
         b.style.pointerEvents = 'auto';
       });
-    }, 600); // соответствует boxOpen 0.6s
+    }, 2000);
   });
 });
 
@@ -579,7 +581,7 @@ checkReward();
 });
 
 function startSakuraRain() {
-  const NUM_PETALS = 120;
+  const NUM_PETALS = 340;
   const svgMarkup = `
     <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
       <path d="M25 0 C15 10, 5 25, 25 50 C45 25, 35 10, 25 0 Z" fill="#FFB6C1"/>
