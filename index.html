@@ -494,7 +494,7 @@ noteButton.onclick = () => openModal(noteModal);
 
   function checkReward() {
     totalTouches = myTouches + friendTouches;
-    if (totalTouches >= 10 && !rewardClaimed) {
+    if (totalTouches >= 1000 && !rewardClaimed) {
       openModal(rewardAvailableModal);
     }
     if (savedNote && totalTouches >= noteThreshold && !noteShown) {
