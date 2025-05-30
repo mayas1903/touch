@@ -525,8 +525,19 @@ noteButton.onclick = () => openModal(noteModal);
     
     document.querySelectorAll('.gift-box').forEach(box => {
   box.addEventListener('click', () => {
+    // Отключаем клики
     document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
+    // Анимация открытия коробки
     box.classList.add('opened');
+    // Через 2 секунды показываем результат
+    setTimeout(() => {
+      closeModal(document.getElementById('boxSelectionModal'));
+      closeModal(rewardLoadingModal);
+      document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
+      document.getElementById('customSpinner')?.remove();
+      startConfettiBurst();
+      openModal(rewardResultModal);
+      // Показываем спиннер
     const spinner = document.createElement('div');
     spinner.id = 'customSpinner';
     spinner.style.cssText = `
@@ -545,16 +556,8 @@ noteButton.onclick = () => openModal(noteModal);
         </circle>
       </svg>
     `;
-    document.querySelectorAll('.gift-box').forEach(box => {
-  box.addEventListener('click', () => {
-    document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
-    box.classList.add('opened');
-    setTimeout(() => {
-      closeModal(document.getElementById('boxSelectionModal'));
-      closeModal(rewardLoadingModal);
-      document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
-      startConfettiBurst();
-      openModal(rewardResultModal);
+    document.body.appendChild(spinner);
+      // Возвращаем возможность кликать
       document.querySelectorAll('.gift-box').forEach(b => {
         b.classList.remove('opened');
         b.style.pointerEvents = 'auto';
@@ -562,6 +565,7 @@ noteButton.onclick = () => openModal(noteModal);
     }, 2000);
   });
 });
+
     // Выбор emoji
 document.querySelectorAll('.emojiChoice').forEach(el => {
   el.addEventListener('click', () => {
