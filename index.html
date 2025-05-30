@@ -619,13 +619,14 @@ function startConfettiBurst() {
 
   for (let i = 0; i < NUM_CONFETTI; i++) {
     const confetti = document.createElement('div');
-    const size = 8 + Math.random() * 12;
+    const size = 6 + Math.random() * 10;
     const color = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * window.innerWidth;
-    const startY = -50 - Math.random() * 300;
-    const rotate = Math.random() * 360;
-    const driftX = (Math.random() - 0.5) * 500;
-    const fallY = window.innerHeight + 60; // точно заканчивают на экране
+    const startY = -100 - Math.random() * 200; // начинают высоко за экраном
+    const driftX = (Math.random() - 0.5) * 300;
+    const fallY = window.innerHeight + 300; // уходят далеко вниз
+    const rotateStart = Math.random() * 360;
+    const rotateEnd = rotateStart + 720;
 
     confetti.style.position = 'fixed';
     confetti.style.left = `${startX}px`;
@@ -634,23 +635,21 @@ function startConfettiBurst() {
     confetti.style.height = `${size}px`;
     confetti.style.backgroundColor = color;
     confetti.style.opacity = '1';
-    confetti.style.transform = `rotate(${rotate}deg)`;
+    confetti.style.transform = `rotate(${rotateStart}deg)`;
     confetti.style.zIndex = '9999';
     confetti.style.pointerEvents = 'none';
-    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'; // половина — кружочки
-
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
     document.body.appendChild(confetti);
-
     confetti.animate([
-      { transform: `translate(0, 0) rotate(${rotate}deg)`, opacity: 1 },
-      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotate + 1080}deg)`, opacity: 0.8 }
+      { transform: `translate(0, 0) rotate(${rotateStart}deg)`, opacity: 1 },
+      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotateEnd}deg)`, opacity: 0.5 }
     ], {
-      duration: 3500 + Math.random() * 1500,
-      easing: 'ease-out',
+      duration: 3000 + Math.random() * 1000,
+      easing: 'cubic-bezier(0.3, 0.7, 0.4, 1)',
       fill: 'forwards'
     });
 
-    setTimeout(() => confetti.remove(), 6000);
+    setTimeout(() => confetti.remove(), 5000);
   }
 }
 
