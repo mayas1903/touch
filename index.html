@@ -545,11 +545,6 @@ const counterHandler = () => {
   openModal(progressModal);
 };
 
-counter.addEventListener('click', (e) => {
-  e.stopPropagation(); // предотвратим случайный вызов handleTouch
-  counterHandler();
-});
-
     // Подключаем Socket.IO
 const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
 const roomId = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe)
@@ -595,7 +590,7 @@ function handleTouch(x, y, target = null) {
   touchCooldown = true;
   setTimeout(() => (touchCooldown = false), 100);
   myTouches++;
-  updateCounter();
+  updateCounter(); // 💡 обновляет счётчик на экране
   createRandomEmoji(x, y, selectedEmoji);
   sendTouch(x, y);
   checkReward();
