@@ -315,9 +315,8 @@
   
   <!-- Кнопка для создания записки -->
 <button id="noteButton" style="
-  position: fixed;
-  top: 20px;
-  right: 20px;
+  margin-top: 8px;
+  margin-bottom: 6px;
   padding: 6px 14px;
   border-radius: 10px;
   background: #ff69b4;
@@ -326,7 +325,6 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  z-index: 9999;
 ">💌 Написать записку</button>
 
 <!-- Модальное окно записи -->
@@ -575,10 +573,10 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   // --- ОБРАБОТЧИК КАСАНИЙ ---
   function handleTouch(x, y, target) {
   if (touchCooldown || isModalOpen) return;
-  const forbidden = ['modal','emojiSelector','emojiChoice','gift-box'];
+  const forbidden = ['modal', 'emojiSelector', 'emojiChoice', 'gift-box'];
   if (
     forbidden.some(cls => target.closest(`.${cls}`)) ||
-    ['counter','helpButton'].includes(target.id) ||
+    ['counter', 'helpButton'].includes(target.id) ||
     target.closest('button')
   ) return;
   touchCooldown = true;
@@ -587,15 +585,22 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   updateCounter();
   updateProgressModal();
   checkReward();
-  // 🆕 Добавляем визуальный эмодзи
   const emoji = document.createElement('div');
   emoji.className = 'heart';
   emoji.textContent = selectedEmoji;
+  emoji.style.position = 'fixed';
   emoji.style.left = `${x - 20}px`;
   emoji.style.top = `${y - 20}px`;
   document.body.appendChild(emoji);
   setTimeout(() => emoji.remove(), 1700);
+  socket.emit('touch', {
+    roomId,
+    x,
+    y,
+    emoji: selectedEmoji
+  });
 }
+
 
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
 
