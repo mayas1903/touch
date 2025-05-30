@@ -432,13 +432,6 @@ saveNoteBtn.onclick = () => {
       requestAnimationFrame(update);
     }
 
-    const helpButton = document.getElementById('helpButton');
-const helpModal = document.getElementById('helpModal');
-
-helpButton.addEventListener('click', () => {
-  openModal(helpModal);
-});
-
 const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
 
     function createRandomEmoji(x, y, emoji = selectedEmoji) {
@@ -467,6 +460,9 @@ const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
   myProgress.style.width = myPercent + '%';
   friendProgress.style.width = friendPercent + '%';
 }
+    
+let touchCooldown = false;
+let isModalOpen = false;
 
     function openModal(modal) {
   isModalOpen = true;  // НЕТ ОБЪЯВЛЕНИЯ
@@ -477,6 +473,12 @@ function closeModal(modal) {
   modal.classList.remove('show');
 }
 
+    const helpButton = document.getElementById('helpButton');
+const helpModal = document.getElementById('helpModal');
+
+helpButton.addEventListener('click', () => {
+  openModal(helpModal);
+});
     function checkReward() {
       totalTouches = myTouches + friendTouches;
       if (totalTouches >= 10 && !rewardAvailableModal.classList.contains('show') && !rewardClaimed) {
@@ -552,13 +554,6 @@ const counterHandler = () => {
 } else {
   counter.addEventListener('click', counterHandler);
 }
-    const counterHandler = () => {
-  myTouches++;                   // Увеличиваем счётчик
-  updateProgressModal();         // Обновляем прогресс (предполагается, что там учитывается myTouches)
-  openModal(progressModal);
-  counter.textContent = myTouches; // Обновляем отображение счётчика на кнопке/элементе
-};
-
 
     // Подключаем Socket.IO
 const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
@@ -585,12 +580,8 @@ console.log('🧠 Подключились к WebSocket-серверу');
    function sendTouch(x, y) {
   socket.emit('touch', { roomId, x, y, emoji: selectedEmoji });
 }
-
-    // Обработчик касания на странице
-    let touchCooldown = false;
-    let isModalOpen = false;
     
-function handleTouch(x, y, target = null) {
+    function handleTouch(x, y, target = null) {
   if (touchCooldown || isModalOpen) return;
   const shouldIgnore = target && (
     target.closest('.modal') ||
