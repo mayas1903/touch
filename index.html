@@ -503,6 +503,19 @@ updateProgressModal();
 checkReward();
   }
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
+   
+    // Создание визуального элемента эмодзи
+const emoji = document.createElement('div');
+emoji.className = 'heart';
+emoji.textContent = selectedEmoji;
+emoji.style.left = `${x - 20}px`;
+emoji.style.top = `${y - 20}px`;
+
+document.body.appendChild(emoji);
+
+// Удаление после анимации
+setTimeout(() => emoji.remove(), 1700);
+
 
   // --- WEBSOCKET + ЭМОДЗИ ---
   const socket = io('https://immense-fantasy-turret.glitch.me');
