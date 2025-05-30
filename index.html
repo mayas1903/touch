@@ -614,17 +614,19 @@ checkReward();
 });
 
 function startConfettiBurst() {
-  const NUM_CONFETTI = 300;
+  const NUM_CONFETTI = 800;
   const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
+
   for (let i = 0; i < NUM_CONFETTI; i++) {
     const confetti = document.createElement('div');
-    const size = 6 + Math.random() * 8;
+    const size = 8 + Math.random() * 12;
     const color = colors[Math.floor(Math.random() * colors.length)];
     const startX = Math.random() * window.innerWidth;
-    const startY = -20 - Math.random() * 200;
+    const startY = -50 - Math.random() * 300;
     const rotate = Math.random() * 360;
-    const driftX = (Math.random() - 0.5) * 300;
-    const fallY = window.innerHeight + 100;
+    const driftX = (Math.random() - 0.5) * 500;
+    const fallY = window.innerHeight + 60; // точно заканчивают на экране
+
     confetti.style.position = 'fixed';
     confetti.style.left = `${startX}px`;
     confetti.style.top = `${startY}px`;
@@ -635,19 +637,23 @@ function startConfettiBurst() {
     confetti.style.transform = `rotate(${rotate}deg)`;
     confetti.style.zIndex = '9999';
     confetti.style.pointerEvents = 'none';
-    confetti.style.borderRadius = '2px';
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'; // половина — кружочки
+
     document.body.appendChild(confetti);
+
     confetti.animate([
       { transform: `translate(0, 0) rotate(${rotate}deg)`, opacity: 1 },
-      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotate + 720}deg)`, opacity: 0.6 }
+      { transform: `translate(${driftX}px, ${fallY}px) rotate(${rotate + 1080}deg)`, opacity: 0.8 }
     ], {
-      duration: 2500 + Math.random() * 1000,
-      easing: 'cubic-bezier(0.3, 0.7, 0.4, 1)',
+      duration: 3500 + Math.random() * 1500,
+      easing: 'ease-out',
       fill: 'forwards'
     });
-    setTimeout(() => confetti.remove(), 4000);
+
+    setTimeout(() => confetti.remove(), 6000);
   }
 }
+
   </script>
 </body>
 </html>
