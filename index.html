@@ -549,10 +549,13 @@ closeRewardBtn.onclick = () => {
 helpButton.onclick = () => openModal(helpModal);
 counter.onclick = () => openModal(progressModal);
 
+    let animationPlayed = false;
 document.querySelectorAll('.gift-box').forEach(box => {
   box.addEventListener('click', () => {
     document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
     box.classList.add('opened');
+    if (animationPlayed) return;
+    animationPlayed = true;
 
     closeModal(document.getElementById('boxSelectionModal'));
 
