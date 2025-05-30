@@ -665,22 +665,22 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
 });
 
 function startConfettiBurst() {
-  const NUM_CONFETTI = 420;
+  const NUM_CONFETTI = 120;
   const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
 
-  // Добавим стили 3D и анимации, если ещё не добавлены
-  if (!document.getElementById('confetti-3d-style')) {
+  // Добавляем стили один раз
+  if (!document.getElementById('confetti-static-style')) {
     const style = document.createElement('style');
-    style.id = 'confetti-3d-style';
+    style.id = 'confetti-static-style';
     style.innerHTML = `
-      @keyframes confetti3DFall {
+      @keyframes confettiFloat {
         0% {
-          transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
           opacity: 1;
+          transform: translateY(0) translateX(0);
         }
         100% {
-          transform: translate3d(var(--drift-x), 100vh, var(--drift-z)) rotateX(360deg) rotateY(360deg) rotateZ(720deg);
-          opacity: 0.7;
+          opacity: 0.9;
+          transform: translateY(100vh) translateX(var(--sway));
         }
       }
     `;
@@ -691,37 +691,34 @@ function startConfettiBurst() {
     const confetti = document.createElement('div');
     const size = 6 + Math.random() * 12;
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const startX = Math.random() * window.innerWidth;
-    const delay = Math.random() * 0.5;
-    const duration = 1.2 + Math.random() * 0.8;
-    const driftX = `${Math.random() * 200 - 100}px`;
-    const driftZ = `${Math.random() * 400 - 200}px`;
-    const rotate = `${Math.random() * 360}deg`;
+    const sway = `${Math.random() * 40 - 20}px`;
+    const duration = 2.2 + Math.random() * 1.5;
+    const delay = Math.random() * 0.3;
+    const startX = window.innerWidth / 2 + (Math.random() * 160 - 80); // Из центра
 
     confetti.style.cssText = `
       position: fixed;
-      top: -20px;
+      top: 50%;
       left: ${startX}px;
       width: ${size}px;
-      height: ${size * 0.5}px;
-      background: ${color};
+      height: ${size * 0.4}px;
+      background-color: ${color};
       opacity: 1;
-      transform: perspective(600px) rotate(${rotate});
-      border-radius: 1px;
-      box-shadow: 0 0 3px rgba(0,0,0,0.3);
-      will-change: transform, opacity;
+      border-radius: 2px;
+      box-shadow: 0 0 2px rgba(0,0,0,0.2);
+      transform: translateY(0);
+      z-index: 9999;
       pointer-events: none;
-      z-index: 99999;
-      animation: confetti3DFall ${duration}s ease-out ${delay}s forwards;
+      animation: confettiFloat ${duration}s ease-in ${delay}s forwards;
     `;
-    confetti.style.setProperty('--drift-x', driftX);
-    confetti.style.setProperty('--drift-z', driftZ);
+    confetti.style.setProperty('--sway', sway);
 
     document.body.appendChild(confetti);
 
     setTimeout(() => confetti.remove(), (duration + delay) * 1000 + 500);
   }
 }
+
 
 
   </script>
