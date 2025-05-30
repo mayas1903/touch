@@ -469,14 +469,13 @@ const emojis = ['❤️', '🌸', '✨', '💩', '💋', '🔥'];
 }
 
     function openModal(modal) {
-      isModalOpen = true;
-      modal.classList.add('show');
-    }
-
-    function closeModal(modal) {
-       isModalOpen = false;
-      modal.classList.remove('show');
-    }
+  isModalOpen = true;  // НЕТ ОБЪЯВЛЕНИЯ
+  modal.classList.add('show');
+}
+function closeModal(modal) {
+  isModalOpen = false; // НЕТ ОБЪЯВЛЕНИЯ
+  modal.classList.remove('show');
+}
 
     function checkReward() {
       totalTouches = myTouches + friendTouches;
@@ -553,6 +552,13 @@ const counterHandler = () => {
 } else {
   counter.addEventListener('click', counterHandler);
 }
+    const counterHandler = () => {
+  myTouches++;                   // Увеличиваем счётчик
+  updateProgressModal();         // Обновляем прогресс (предполагается, что там учитывается myTouches)
+  openModal(progressModal);
+  counter.textContent = myTouches; // Обновляем отображение счётчика на кнопке/элементе
+};
+
 
     // Подключаем Socket.IO
 const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
