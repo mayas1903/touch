@@ -507,6 +507,7 @@ noteButton.onclick = () => openModal(noteModal);
   // --- ОБРАБОТКА КНОПОК И СОБЫТИЙ ---
   closeProgressBtn.onclick = () => closeModal(progressModal);
   openRewardBtn.onclick    = () => {
+    if (rewardClaimed) return;
     closeModal(rewardAvailableModal);
     openModal(rewardLoadingModal);
     setTimeout(() => {
@@ -545,12 +546,14 @@ noteButton.onclick = () => openModal(noteModal);
         </circle>
       </svg>
     `;
-    document.body.appendChild(spinner);
+    document.querySelectorAll('.gift-box').forEach(box => {
+  box.addEventListener('click', () => {
+    document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
+    box.classList.add('opened');
     setTimeout(() => {
       closeModal(document.getElementById('boxSelectionModal'));
       closeModal(rewardLoadingModal);
       document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
-      document.getElementById('customSpinner')?.remove();
       startConfettiBurst();
       openModal(rewardResultModal);
       document.querySelectorAll('.gift-box').forEach(b => {
@@ -560,7 +563,6 @@ noteButton.onclick = () => openModal(noteModal);
     }, 2000);
   });
 });
-
     // Выбор emoji
 document.querySelectorAll('.emojiChoice').forEach(el => {
   el.addEventListener('click', () => {
