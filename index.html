@@ -193,29 +193,30 @@
   font-size: 14px; 
 }
     
-.emojiChoice {
-  cursor: pointer;
-  font-size: 24px;
-  padding: 6px;
-  margin: 3px;
-  border-radius: 6px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  background: transparent;
-}
-.emojiChoice.selected {
-  transform: scale(1.15);
-  box-shadow: 0 0 6px #ff69b4;
-  background: #fff0f5;
-}
 #emojiSelector {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  margin: 16px auto;
-  gap: 6px;
+  margin: 12px auto 4px; /* уменьшенный отступ снизу */
+  gap: 6px;              /* расстояние между эмодзи немного уменьшено */
   max-width: 90%;
   z-index: 1000;
 }
+.emojiChoice {
+  cursor: pointer;
+  font-size: 36px; /* немного увеличено */
+  padding: 8px;
+  margin: 3px;
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: transparent;
+}
+.emojiChoice.selected {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px #ff69b4;
+  background: #fff0f5;
+}
+
     
 @keyframes sway {
   0%   { transform: translateX(0px) rotate(0deg); }
@@ -573,10 +574,10 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   // --- ОБРАБОТЧИК КАСАНИЙ ---
   function handleTouch(x, y, target) {
   if (touchCooldown || isModalOpen) return;
-  const forbidden = ['modal', 'emojiSelector', 'emojiChoice', 'gift-box'];
+  const forbidden = ['modal','emojiSelector','emojiChoice','gift-box'];
   if (
     forbidden.some(cls => target.closest(`.${cls}`)) ||
-    ['counter', 'helpButton'].includes(target.id) ||
+    ['counter','helpButton'].includes(target.id) ||
     target.closest('button')
   ) return;
   touchCooldown = true;
@@ -584,31 +585,24 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   myTouches++;
   updateCounter();
   updateProgressModal();
-  checkReward();
+  checkReward(); 
+  // 🆕 Добавляем визуальный эмодзи
   const emoji = document.createElement('div');
   emoji.className = 'heart';
   emoji.textContent = selectedEmoji;
-  emoji.style.position = 'fixed';
   emoji.style.left = `${x - 20}px`;
   emoji.style.top = `${y - 20}px`;
   document.body.appendChild(emoji);
   setTimeout(() => emoji.remove(), 1700);
-  socket.emit('touch', {
-    roomId,
-    x,
-    y,
-    emoji: selectedEmoji
-  });
 }
-
 
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
 
   // --- WEBSOCKET + ЭМОДЗИ ---
   const socket = io('https://immense-fantasy-turret.glitch.me');
   const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
- socket.on('connect', () => {
     socket.emit('joinRoom', roomId);
+    socket.on('connect', () => {
     document.querySelectorAll('.emojiChoice').forEach(el => {
       el.onclick = () => {
         selectedEmoji = el.textContent;
