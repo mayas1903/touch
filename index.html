@@ -100,14 +100,14 @@
 .gift-box {
   font-size: 40px;
   cursor: pointer;
-  transition: transform 0.4s ease;
+  transition: transform 0.6s ease;
   user-select: none;
 }
 .gift-box:hover {
   transform: scale(1.2);
 }
 .gift-box.opened {
-  animation: boxOpen 0.6s forwards;
+  animation: boxOpen 0.8s forwards;
 }
 @keyframes boxOpen {
   0% { transform: scale(1) rotate(0deg); }
@@ -187,6 +187,13 @@
   transform: scale(1.3);
   box-shadow: 0 0 10px #ff69b4;
   background: #fff0f5;
+}
+    #emojiSelector {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0; /* 🔼 отступ сверху и снизу */
+  gap: 8px; /* Дополнительное расстояние, если flex перенесёт строки */
 }
     
 @keyframes sway {
@@ -281,7 +288,7 @@
 
  <div id="boxSelectionModal" class="modal">
   <h3>🤩 Выберите одну из коробочек:</h3>
-  <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+  <div style="display: flex; justify-content: space-around; margin-top: 40px;">
     <div class="gift-box" data-box="1">🎁</div>
     <div class="gift-box" data-box="2">🎁</div>
     <div class="gift-box" data-box="3">🎁</div>
@@ -473,9 +480,11 @@
     closeModal(document.getElementById('boxSelectionModal'));
     const reward = 'Telegram Premium на 3 месяца!'; // Можешь добавить случайный выбор
     document.getElementById('rewardResultText').textContent = `Вам выпал ${reward}`;
-    openModal(rewardResultModal);
+    startSakuraRain(); // 🌸 Запуск анимации Сакуры
+    openModal(rewardResultModal); // Открываем модалку "Ура!"
   });
 });
+
 
     // Выбор emoji
 document.querySelectorAll('.emojiChoice').forEach(el => {
@@ -561,7 +570,6 @@ function startSakuraRain() {
     const driftX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 30);
     const startY = -50 - Math.random() * 50;
 
-    // Обёртка div
     wrapper.style.position = 'fixed';
     wrapper.style.left = `${startX}px`;
     wrapper.style.top = `${startY}px`;
@@ -569,7 +577,7 @@ function startSakuraRain() {
     wrapper.style.height = `${size}px`;
     wrapper.style.pointerEvents = 'none';
     wrapper.style.zIndex = '9999';
-    wrapper.style.transform = 'translate(0, 0)'; // 🔑 начальное значение
+    wrapper.style.transform = 'translate(0, 0)';
 
     svg.style.width = '100%';
     svg.style.height = '100%';
@@ -579,25 +587,21 @@ function startSakuraRain() {
 
     document.body.appendChild(wrapper);
 
-    setTimeout(() => {
-      svg.style.opacity = '1';
-    }, 10);
+    const fallDistance = window.innerHeight - startY + 50;
 
-    // Анимация полёта
     wrapper.animate([
       { transform: 'translate(0, 0)', opacity: 1 },
-      { transform: `translate(${driftX}px, 100vh)`, opacity: 0 }
+      { transform: `translate(${driftX}px, ${fallDistance}px)`, opacity: 0 }
     ], {
       duration: 4000,
       easing: 'ease-in-out',
       fill: 'forwards'
     });
 
-    setTimeout(() => {
-      wrapper.remove();
-    }, 4200);
+    setTimeout(() => wrapper.remove(), 4200);
   }
 }
+
 
   </script>
 </body>
