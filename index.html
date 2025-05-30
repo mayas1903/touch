@@ -542,17 +542,13 @@ document.querySelectorAll('.gift-box').forEach(box => {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 const counterHandler = () => {
-  updateProgressModal();
   openModal(progressModal);
 };
-if (isTouchDevice()) {
-  counter.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    counterHandler();
-  });
-} else {
-  counter.addEventListener('click', counterHandler);
-}
+
+counter.addEventListener('click', (e) => {
+  e.stopPropagation(); // предотвратим случайный вызов handleTouch
+  counterHandler();
+});
 
     // Подключаем Socket.IO
 const socket = io('https://immense-fantasy-turret.glitch.me'); // адрес твоего сервера
