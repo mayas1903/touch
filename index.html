@@ -505,59 +505,61 @@ noteButton.onclick = () => openModal(noteModal);
   }
 
   // --- ОБРАБОТКА КНОПОК И СОБЫТИЙ ---
-  closeProgressBtn.onclick = () => closeModal(progressModal);
-  openRewardBtn.onclick    = () => {
-    closeModal(rewardAvailableModal);
-    openModal(rewardLoadingModal);
-    setTimeout(() => {
-      closeModal(rewardLoadingModal);
-      openModal(document.getElementById('boxSelectionModal'));
-    }, 2000);
-  };
-  closeRewardBtn.onclick = () => {
-    rewardClaimed = true;
+ closeProgressBtn.onclick = () => closeModal(progressModal);
+
+openRewardBtn.onclick = () => {
+  closeModal(rewardAvailableModal);
+  openModal(rewardLoadingModal);
+  setTimeout(() => {
+    closeModal(rewardLoadingModal);
+    openModal(document.getElementById('boxSelectionModal'));
+  }, 2000);
+};
+
+closeRewardBtn.onclick = () => {
+  rewardClaimed = true;
+
+  const spinner = document.createElement('div');
+  spinner.id = 'customSpinner';
+  spinner.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20000;
+  `;
+  spinner.innerHTML = `
+    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
+      <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
+        stroke-dasharray="164.93361431346415 56.97787143782138">
+        <animateTransform attributeName="transform" type="rotate"
+          repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
+      </circle>
+    </svg>
+  `;
+  document.body.appendChild(spinner);
+
+  setTimeout(() => {
+    document.getElementById('customSpinner')?.remove();
     closeModal(rewardResultModal);
     alert('Подарок активирован! 🎁');
-  };
+  }, 2000);
+};
 
-  helpButton.onclick = () => openModal(helpModal);
-  counter.onclick = () => openModal(progressModal);
-    
-    document.querySelectorAll('.gift-box').forEach(box => {
+helpButton.onclick = () => openModal(helpModal);
+counter.onclick = () => openModal(progressModal);
+
+document.querySelectorAll('.gift-box').forEach(box => {
   box.addEventListener('click', () => {
-    // Отключаем клики
     document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
-    // Анимация открытия коробки
     box.classList.add('opened');
-    // Через 2 секунды показываем результат
+
     setTimeout(() => {
       closeModal(document.getElementById('boxSelectionModal'));
       closeModal(rewardLoadingModal);
       document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
-      document.getElementById('customSpinner')?.remove();
       startConfettiBurst();
       openModal(rewardResultModal);
-      // Показываем спиннер
-    const spinner = document.createElement('div');
-    spinner.id = 'customSpinner';
-    spinner.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 20000;
-    `;
-    spinner.innerHTML = `
-      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
-        <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
-          stroke-dasharray="164.93361431346415 56.97787143782138">
-          <animateTransform attributeName="transform" type="rotate"
-            repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
-        </circle>
-      </svg>
-    `;
-    document.body.appendChild(spinner);
-      // Возвращаем возможность кликать
       document.querySelectorAll('.gift-box').forEach(b => {
         b.classList.remove('opened');
         b.style.pointerEvents = 'auto';
