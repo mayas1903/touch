@@ -379,6 +379,20 @@
   let selectedEmoji = '❤️';
 
   // --- ЭЛЕМЕНТЫ DOM ---
+let myTouches = 0;
+  let friendTouches = 0;
+  let totalTouches = 0;
+  let touchCooldown = false;
+  let isModalOpen = false;   // <-- объявляем перед использованием
+
+  let savedNote = null;
+  let noteThreshold = 0;
+  let noteShown = false;
+  let rewardClaimed = false;
+
+  let selectedEmoji = '❤️';
+
+  // --- ЭЛЕМЕНТЫ DOM ---
   const counter = document.getElementById('counter');
   const progressModal = document.getElementById('progressModal');
   const rewardAvailableModal = document.getElementById('rewardAvailableModal');
