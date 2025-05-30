@@ -501,21 +501,18 @@ if (
 updateCounter();
 updateProgressModal();
 checkReward();
-  }
+  // 🆕 Добавляем визуальный эмодзи
+  const emoji = document.createElement('div');
+  emoji.className = 'heart';
+  emoji.textContent = selectedEmoji;
+  emoji.style.left = `${x - 20}px`;
+  emoji.style.top = `${y - 20}px`;
+  document.body.appendChild(emoji);
+  setTimeout(() => emoji.remove(), 1700);
+}
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
-   
-    // Создание визуального элемента эмодзи
-const emoji = document.createElement('div');
-emoji.className = 'heart';
-emoji.textContent = selectedEmoji;
-emoji.style.left = `${x - 20}px`;
-emoji.style.top = `${y - 20}px`;
 
-document.body.appendChild(emoji);
-
-// Удаление после анимации
-setTimeout(() => emoji.remove(), 1700);
-
+    
 
   // --- WEBSOCKET + ЭМОДЗИ ---
   const socket = io('https://immense-fantasy-turret.glitch.me');
@@ -532,11 +529,20 @@ setTimeout(() => emoji.remove(), 1700);
     document.querySelectorAll('.emojiChoice')[0].classList.add('selected');
   });
   socket.on('friendTouch', ({x, y, emoji}) => {
-    friendTouches++;
-    updateCounter();
-    updateProgressModal();
-    checkReward();
-  });
+  friendTouches++;
+  updateCounter();
+  updateProgressModal();
+  checkReward();
+  // Показываем эмодзи от друга
+  const emojiEl = document.createElement('div');
+  emojiEl.className = 'heart';
+  emojiEl.textContent = emoji;
+  emojiEl.style.left = `${x - 20}px`;
+  emojiEl.style.top = `${y - 20}px`;
+  document.body.appendChild(emojiEl);
+  setTimeout(() => emojiEl.remove(), 1700);
+});
+
 
 function startSakuraRain() {
   const NUM_PETALS = 40;
@@ -592,7 +598,7 @@ function startSakuraRain() {
     }, 4200);
   }
 }
-startSakuraRain()
+
   </script>
 </body>
 </html>
