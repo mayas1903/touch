@@ -204,7 +204,7 @@
 
 .emojiChoice {
   cursor: pointer;
-  font-size: 28px; /* уменьшено */
+  font-size: 25px; /* уменьшено */
   padding: 6px;
   margin: 2px;
   border-radius: 8px;
@@ -593,6 +593,12 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   emoji.style.top = `${y - 20}px`;
   document.body.appendChild(emoji);
   setTimeout(() => emoji.remove(), 1700);
+    socket.emit('touch', {
+    roomId,
+    x,
+    y,
+    emoji: selectedEmoji
+  });
 }
 
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
@@ -600,8 +606,8 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   // --- WEBSOCKET + ЭМОДЗИ ---
   const socket = io('https://immense-fantasy-turret.glitch.me');
   const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
+   socket.on('connect', () => {
     socket.emit('joinRoom', roomId);
-    socket.on('connect', () => {
     document.querySelectorAll('.emojiChoice').forEach(el => {
       el.onclick = () => {
         selectedEmoji = el.textContent;
