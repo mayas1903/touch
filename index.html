@@ -665,10 +665,18 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
 });
 
 function startConfettiBurst() {
-  const NUM_CONFETTI = 450;
-  const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
+  const NUM_CONFETTI = 150;
+  const gradients = [
+    'linear-gradient(45deg, #FF3CAC, #784BA0)',
+    'linear-gradient(45deg, #FF9A8B, #FFD700)',
+    'linear-gradient(45deg, #F6D365, #FDA085)',
+    'linear-gradient(45deg, #42E695, #3BB2B8)',
+    'linear-gradient(45deg, #2F80ED, #56CCF2)',
+    'linear-gradient(45deg, #FF6F61, #DE4313)',
+    'linear-gradient(45deg, #8A2BE2, #DA22FF)'
+  ];
 
-  // Добавляем стили, если ещё не добавлены
+  // Добавляем стиль анимации при первом запуске
   if (!document.getElementById('confetti-style')) {
     const style = document.createElement('style');
     style.id = 'confetti-style';
@@ -679,7 +687,7 @@ function startConfettiBurst() {
           opacity: 1;
         }
         100% {
-          transform: translateY(100vh) rotate(360deg);
+          transform: translateY(100vh) translateX(var(--drift)) rotate(360deg);
           opacity: 0;
         }
       }
@@ -689,31 +697,31 @@ function startConfettiBurst() {
 
   for (let i = 0; i < NUM_CONFETTI; i++) {
     const confetti = document.createElement('div');
-    const size = 6 + Math.random() * 10;
-    const color = colors[Math.floor(Math.random() * colors.length)];
+    const width = 4 + Math.random() * 10;
+    const height = width * (1.5 + Math.random()); // разная форма
+    const gradient = gradients[Math.floor(Math.random() * gradients.length)];
     const startX = Math.random() * window.innerWidth;
     const delay = Math.random() * 2;
+    const drift = `${Math.random() * 100 - 50}px`; // движение влево/вправо
 
     confetti.style.position = 'fixed';
     confetti.style.left = `${startX}px`;
     confetti.style.top = `-40px`;
-    confetti.style.width = `${size}px`;
-    confetti.style.height = `${size * 3}px`;
-    confetti.style.backgroundColor = color;
-    confetti.style.opacity = '0.8';
+    confetti.style.width = `${width}px`;
+    confetti.style.height = `${height}px`;
+    confetti.style.backgroundImage = gradient;
+    confetti.style.opacity = '0.9';
     confetti.style.borderRadius = '2px';
     confetti.style.pointerEvents = 'none';
     confetti.style.zIndex = '9999';
-    confetti.style.animation = `confettiFall 4s linear ${delay}s forwards`;
+    confetti.style.setProperty('--drift', drift);
+    confetti.style.animation = `confettiFall ${3 + Math.random() * 2}s ease-in ${delay}s forwards`;
 
     document.body.appendChild(confetti);
 
-    // Удаление элемента после завершения анимации
-    setTimeout(() => confetti.remove(), 6000);
+    setTimeout(() => confetti.remove(), 7000);
   }
 }
-
-
 
   </script>
 </body>
