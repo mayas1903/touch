@@ -98,22 +98,30 @@
     }
 
 .gift-box {
-  font-size: 40px;
+  font-size: 60px; /* ⬆️ Больше размер */
   cursor: pointer;
-  transition: transform 0.6s ease;
+  transition: transform 0.3s ease, filter 0.3s ease;
   user-select: none;
+  animation: pulseGift 2s infinite ease-in-out;
 }
 .gift-box:hover {
   transform: scale(1.2);
+  filter: brightness(1.1);
 }
 .gift-box.opened {
-  animation: boxOpen 0.8s forwards;
+  animation: boxOpen 0.8s ease forwards;
 }
+/* 🔁 Пульсация */
+@keyframes pulseGift {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+}
+/* 📦 Анимация открытия */
 @keyframes boxOpen {
-  0% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.5) rotate(15deg); }
-  100% { transform: scale(1.2) rotate(-5deg); opacity: 0; }
-}
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  50%  { transform: scale(1.5) rotate(15deg); }
+  100% {
+
 
     .heart {
       position: absolute;
@@ -472,19 +480,29 @@
   };
 
   helpButton.onclick = () => openModal(helpModal);
-
   counter.onclick = () => openModal(progressModal);
-
+    
     document.querySelectorAll('.gift-box').forEach(box => {
   box.addEventListener('click', () => {
-    closeModal(document.getElementById('boxSelectionModal'));
-    const reward = 'Telegram Premium на 3 месяца!'; // Можешь добавить случайный выбор
-    document.getElementById('rewardResultText').textContent = `Вам выпал ${reward}`;
-    startSakuraRain(); // 🌸 Запуск анимации Сакуры
-    openModal(rewardResultModal); // Открываем модалку "Ура!"
+    // Отключаем выбор, чтобы не кликали по другим
+    document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
+    // Запускаем анимацию
+    box.classList.add('opened');
+    // ⏳ Ждём завершения анимации
+    setTimeout(() => {
+      closeModal(document.getElementById('boxSelectionModal'));
+      const reward = 'Telegram Premium на 3 месяца!'; // Можешь добавить рандом
+      document.getElementById('rewardResultText').textContent = `Вам выпал ${reward}`;
+      startSakuraRain(); // 🌸
+      openModal(rewardResultModal);
+      // Возвращаем состояние (на всякий случай)
+      document.querySelectorAll('.gift-box').forEach(b => {
+        b.classList.remove('opened');
+        b.style.pointerEvents = 'auto';
+      });
+    }, 600); // соответствует boxOpen 0.6s
   });
 });
-
 
     // Выбор emoji
 document.querySelectorAll('.emojiChoice').forEach(el => {
@@ -552,13 +570,17 @@ checkReward();
   setTimeout(() => emojiEl.remove(), 1700);
 });
 
-
 function startSakuraRain() {
-  const NUM_PETALS = 40;
+  const NUM_PETALS = 120;
   const svgMarkup = `
     <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
       <path d="M25 0 C15 10, 5 25, 25 50 C45 25, 35 10, 25 0 Z" fill="#FFB6C1"/>
     </svg>`;
+
+  // 🌬️ Настроим направление ветра:
+  const windDirection = Math.random() > 0.5 ? 1 : -1; // 1 = вправо, -1 = влево
+  const windStrength = 60 + Math.random() * 60; // от 60 до 120 px
+  const baseWind = windDirection * windStrength;
 
   for (let i = 0; i < NUM_PETALS; i++) {
     const wrapper = document.createElement('div');
@@ -567,8 +589,9 @@ function startSakuraRain() {
 
     const size = 20 + Math.random() * 20;
     const startX = Math.random() * window.innerWidth;
-    const driftX = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 30);
-    const startY = -50 - Math.random() * 50;
+    const driftVariance = (Math.random() - 0.5) * 40; // немного "разброса"
+    const driftX = baseWind + driftVariance;
+    const startY = -50 - Math.random() * 100;
 
     wrapper.style.position = 'fixed';
     wrapper.style.left = `${startX}px`;
@@ -583,22 +606,22 @@ function startSakuraRain() {
     svg.style.height = '100%';
     svg.style.opacity = '1';
     svg.style.transition = 'opacity 1s ease';
-    svg.style.animation = `sway ${3 + Math.random()}s ease-in-out infinite`;
+    svg.style.animation = `sway ${3 + Math.random() * 2}s ease-in-out infinite`;
 
     document.body.appendChild(wrapper);
-
-    const fallDistance = window.innerHeight - startY + 50;
-
-    wrapper.animate([
-      { transform: 'translate(0, 0)', opacity: 1 },
-      { transform: `translate(${driftX}px, ${fallDistance}px)`, opacity: 0 }
-    ], {
-      duration: 4000,
-      easing: 'ease-in-out',
-      fill: 'forwards'
-    });
-
-    setTimeout(() => wrapper.remove(), 4200);
+    const fallDistance = window.innerHeight - startY + 100;
+    const delay = Math.random() * 1500;
+    setTimeout(() => {
+      wrapper.animate([
+        { transform: 'translate(0, 0)', opacity: 1 },
+        { transform: `translate(${driftX}px, ${fallDistance}px)`, opacity: 0 }
+      ], {
+        duration: 4000,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+      })
+      setTimeout(() => wrapper.remove(), 4200);
+    }, delay);
   }
 }
 
