@@ -24,14 +24,14 @@
 
     .heart {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  width: 60px; /* увеличено */
+  height: 60px; /* увеличено */
   pointer-events: none;
-  animation: fadeOutSlow 1.7s ease forwards;
+  animation: fadeOutSlow 3s ease forwards; /* увеличена длительность */
   opacity: 1;
   z-index: 1000;
-  font-size: 35px;
-  line-height: 70px;
+  font-size: 50px; /* увеличено */
+  line-height: 60px;
   text-align: center;
   user-select: none;
 }
@@ -617,7 +617,7 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   emoji.style.left = `${x - 20}px`;
   emoji.style.top = `${y - 20}px`;
   document.body.appendChild(emoji);
-  setTimeout(() => emoji.remove(), 1700);
+  setTimeout(() => emoji.remove(), 3000);
     socket.emit('touch', {
     roomId,
     x,
@@ -654,7 +654,7 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   emojiEl.style.left = `${x - 20}px`;
   emojiEl.style.top = `${y - 20}px`;
   document.body.appendChild(emojiEl);
-  setTimeout(() => emojiEl.remove(), 1700);
+  setTimeout(() => emojiEl.remove(), 3000);
 });
 
 function startConfettiBurst() {
