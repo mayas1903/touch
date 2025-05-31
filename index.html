@@ -264,24 +264,49 @@
   </style>
 </head>
 <body>
-  
-<!-- Кнопка включения режима рисования -->
-<button id="drawToggleBtn" style="position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 8px 14px; border-radius: 10px; background: #ff69b4; color: white; border: none; font-size: 14px; font-weight: 500; cursor: pointer;">✏️ Рисовать</button>
-<button id="saveCanvasBtn" style="margin-top: 4px; padding: 4px 6px; font-size: 12px;">Сохранить</button>
+<!-- Кнопка "Рисовать" рядом с "?" -->
+<button id="drawToggleBtn" style="
+  position: fixed;
+  bottom: 20px;
+  left: 70px;
+  width: 42px;
+  height: 42px;
+  background: #8e44ad;
+  border-radius: 50%;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 9999;
+">✏️</button>
 
-<!-- Палитра цветов -->
-<div id="colorPalette" style="position: fixed; top: 70px; right: 20px; z-index: 9999; display: none; flex-direction: column; gap: 6px;">
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #000000; cursor: pointer;" data-color="#000000"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff0000; cursor: pointer;" data-color="#ff0000"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ffa500; cursor: pointer;" data-color="#ffa500"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ffff00; cursor: pointer;" data-color="#ffff00"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #00ff00; cursor: pointer;" data-color="#00ff00"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #0000ff; cursor: pointer;" data-color="#0000ff"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #800080; cursor: pointer;" data-color="#800080"></div>
-  <button id="clearCanvasBtn" style="margin-top: 6px; padding: 4px 6px; font-size: 12px;">Очистить</button>
+<!-- Палитра (вверх) -->
+<div id="colorPalette" style="
+  position: fixed;
+  bottom: 70px;
+  left: 70px;
+  z-index: 9999;
+  display: none;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 6px;
+">
+  <div style="width: 24px; height: 24px; border-radius: 50%; background: #00ffff; box-shadow: 0 0 6px #00ffff;" data-color="#00ffff"></div>
+  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff00ff; box-shadow: 0 0 6px #ff00ff;" data-color="#ff00ff"></div>
+  <div style="width: 24px; height: 24px; border-radius: 50%; background: #00ff00; box-shadow: 0 0 6px #00ff00;" data-color="#00ff00"></div>
+  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ffff00; box-shadow: 0 0 6px #ffff00;" data-color="#ffff00"></div>
+  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff0000; box-shadow: 0 0 6px #ff0000;" data-color="#ff0000"></div>
+  <div style="width: 24px; height: 24px; border-radius: 50%; background: #0000ff; box-shadow: 0 0 6px #0000ff;" data-color="#0000ff"></div>
+  <button id="clearCanvasBtn" style="margin-top: 6px; padding: 4px 6px; font-size: 12px;">🗑</button>
+  <button id="saveCanvasBtn" style="padding: 4px 6px; font-size: 12px;">💾</button>
 </div>
-  
-  <canvas id="drawCanvas" style="position: fixed; top: 0; left: 0; z-index: 5000; display: none;"></canvas>
+
+<!-- Canvas -->
+<canvas id="drawCanvas" style="position: fixed; top: 0; left: 0; z-index: 5000; display: none;"></canvas>
 
   <!-- Кнопка помощи -->
 <div id="helpButton" style="
@@ -464,15 +489,16 @@
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
-    let drawMode = false;
+ let drawMode = false;
 let isDrawing = false;
 let ctx;
-let currentColor = "#000000";
+let currentColor = "#00ffff";
 
 const canvas = document.getElementById('drawCanvas');
 const toggleBtn = document.getElementById('drawToggleBtn');
 const colorPalette = document.getElementById('colorPalette');
 const clearBtn = document.getElementById('clearCanvasBtn');
+const saveBtn = document.getElementById('saveCanvasBtn');
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -480,40 +506,66 @@ function resizeCanvas() {
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
+
 toggleBtn.onclick = () => {
   drawMode = !drawMode;
   canvas.style.display = drawMode ? 'block' : 'none';
   colorPalette.style.display = drawMode ? 'flex' : 'none';
 };
+
 canvas.addEventListener('pointerdown', e => {
   if (!drawMode) return;
   isDrawing = true;
   ctx.beginPath();
   ctx.moveTo(e.clientX, e.clientY);
+  socket.emit('startLine', {
+    roomId,
+    x: e.clientX,
+    y: e.clientY,
+    color: currentColor
+  });
 });
+
 canvas.addEventListener('pointermove', e => {
   if (!drawMode || !isDrawing) return;
   ctx.lineTo(e.clientX, e.clientY);
   ctx.stroke();
+  socket.emit('drawLine', {
+    roomId,
+    x: e.clientX,
+    y: e.clientY,
+    color: currentColor
+  });
 });
+
 canvas.addEventListener('pointerup', () => {
   if (!drawMode) return;
   isDrawing = false;
 });
+
 ctx = canvas.getContext('2d');
 ctx.lineWidth = 4;
 ctx.lineJoin = 'round';
 ctx.lineCap = 'round';
 ctx.strokeStyle = currentColor;
+
 document.querySelectorAll('#colorPalette [data-color]').forEach(el => {
   el.onclick = () => {
     currentColor = el.getAttribute('data-color');
     ctx.strokeStyle = currentColor;
   };
 });
+
 clearBtn.onclick = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
+
+saveBtn.onclick = () => {
+  const link = document.createElement('a');
+  link.download = 'рисунок.png';
+  link.href = canvas.toDataURL();
+  link.click();
+};   
     
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
@@ -668,7 +720,7 @@ function handleTouch(x, y, target) {
     ['counter', 'helpButton'].includes(target.id) ||
     target.closest('button')
   ) return;
-
+if (drawMode) return; // отключаем эмодзи в режиме рисования
   touchCooldown = true;
   setTimeout(() => touchCooldown = false, 100);
 
@@ -794,16 +846,6 @@ function startConfettiBurst() {
     setTimeout(() => confetti.remove(), duration * 1000 + 100);
   }
 }
-
-    const saveBtn = document.getElementById('saveCanvasBtn');
-
-// Сохранение как PNG
-saveBtn.onclick = () => {
-  const link = document.createElement('a');
-  link.download = 'рисунок.png';
-  link.href = canvas.toDataURL();
-  link.click();
-};
 
   </script>
 </body>
