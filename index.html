@@ -651,127 +651,137 @@ document.querySelectorAll('.gift-box').forEach(box => {
 });
 
 // --- WebSocket и инициализация (с резервом для браузера) ---
-const isTelegram = typeof Telegram !== 'undefined' && Telegram.WebApp?.initDataUnsafe?.user;
-const tgUser = isTelegram
-  ? Telegram.WebApp.initDataUnsafe.user
-  : {
-      id: 'test_' + Math.random().toString(36).substring(2, 6),
-      first_name: 'Тест',
-      photo_url: 'https://i.pravatar.cc/32?u=' + Math.random()
-    };
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
+    console.warn("❌ Telegram WebApp недоступен");
+    return;
+  }
 
-// Получаем roomId из URL, если есть (для входа по ссылке)
-const urlParams = new URLSearchParams(window.location.search);
-const urlRoomId = urlParams.get('roomId');
+  Telegram.WebApp.ready(); // обязательно!
 
-// Логика выбора roomId и viaLink
-const viaLink = !!urlRoomId;
-const savedPairRoom = localStorage.getItem('pairRoomId');
+  const tgUser = Telegram.WebApp.initDataUnsafe?.user;
 
-// Уникальный roomId для текущего пользователя (постоянный)
-const permanentRoomId = tgUser.username || `id${tgUser.id}`;
+  if (!tgUser) {
+    console.warn("❌ Не удалось получить данные пользователя Telegram");
+    return;
+  }
 
-// Выбираем roomId:
-// если по ссылке — берём из ссылки
-// иначе — либо сохранённая комната пары, либо постоянная
-const roomId = viaLink ? urlRoomId : (savedPairRoom || permanentRoomId);
+  console.log('👤 Telegram User:', tgUser); // отладка
 
-const userId = tgUser.id;
-const userName = tgUser.first_name || 'Ты';
-const photoUrl = tgUser.photo_url || 'https://via.placeholder.com/32';
+  // Получаем roomId из URL, если есть (для входа по ссылке)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlRoomId = urlParams.get('roomId');
 
-const socket = io('https://immense-fantasy-turret.glitch.me');
+  // Логика выбора roomId и viaLink
+  const viaLink = !!urlRoomId;
+  const savedPairRoom = localStorage.getItem('pairRoomId');
 
-// 👥 Переменные для отображения имени и аватарки
-let friendName = 'Друг';
-let friendAvatar = '';
-let myName = userName;
-let myAvatar = photoUrl;
+  // Уникальный roomId для текущего пользователя (постоянный)
+  const permanentRoomId = tgUser.username || `id${tgUser.id}`;
 
-socket.on('connect', () => {
-  console.log('📡 WebSocket подключён');
-  socket.emit('joinRoom', {
-    roomId,
-    userId,
-    name: userName,
-    avatar: photoUrl,
-    viaLink
+  // Выбираем roomId:
+  // если по ссылке — берём из ссылки
+  // иначе — либо сохранённая комната пары, либо постоянная
+  const roomId = viaLink ? urlRoomId : (savedPairRoom || permanentRoomId);
+
+  const userId = tgUser.id;
+  const userName = tgUser.first_name || 'Ты';
+  const photoUrl = tgUser.photo_url || 'https://via.placeholder.com/32';
+
+  const socket = io('https://immense-fantasy-turret.glitch.me');
+
+  // 👥 Переменные для отображения имени и аватарки
+  let friendName = 'Друг';
+  let friendAvatar = '';
+  let myName = userName;
+  let myAvatar = photoUrl;
+
+  socket.on('connect', () => {
+    console.log('📡 WebSocket подключён');
+    socket.emit('joinRoom', {
+      roomId,
+      userId,
+      name: userName,
+      avatar: photoUrl,
+      viaLink
+    });
   });
-});
 
-// --- Получение начальных данных и установка пары ---
-socket.on('initialData', ({ my, friend }) => {
-  myTouches = my.count || 0;
-  myName = my.name || userName;
-  myAvatar = my.avatar || photoUrl;
+  // --- Получение начальных данных и установка пары ---
+  socket.on('initialData', ({ my, friend }) => {
+    myTouches = my.count || 0;
+    myName = my.name || userName;
+    myAvatar = my.avatar || photoUrl;
 
-  if (friend) {
-    friendName = friend.name || 'Друг';
-    friendAvatar = friend.avatar || '';
-    friendTouches = friend.count || 0;
+    if (friend) {
+      friendName = friend.name || 'Друг';
+      friendAvatar = friend.avatar || '';
+      friendTouches = friend.count || 0;
 
-    // Сохраняем комнату пары только если вход был по ссылке
-    if (viaLink) {
-      localStorage.setItem('pairRoomId', roomId);
-      console.log('✅ Пара сохранена:', roomId);
+      // Сохраняем комнату пары только если вход был по ссылке
+      if (viaLink) {
+        localStorage.setItem('pairRoomId', roomId);
+        console.log('✅ Пара сохранена:', roomId);
+      }
+    } else {
+      friendName = 'Друг';
+      friendAvatar = '';
+      friendTouches = 0;
     }
-  } else {
-    friendName = 'Друг';
-    friendAvatar = '';
-    friendTouches = 0;
-  }
 
-  updateCounter();
-  updateProgressModal();
-});
-
-
-// --- Выбор emoji ---
-document.querySelectorAll('.emojiChoice').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedEmoji = el.textContent;
+    updateCounter();
+    updateProgressModal();
   });
-});
-document.querySelectorAll('.emojiChoice')[0]?.classList.add('selected');
 
-// --- Эффект от друга ---
-socket.on('friendTouch', ({ x, y, emoji }) => {
-  friendTouches++;
-  updateCounter();
-  updateProgressModal();
-  checkReward();
-  const emojiEl = document.createElement('div');
-  emojiEl.className = 'heart';
-  emojiEl.textContent = emoji;
-  emojiEl.style.left = `${x - 20}px`;
-  emojiEl.style.top = `${y - 20}px`;
-  document.body.appendChild(emojiEl);
-  setTimeout(() => emojiEl.remove(), 1700);
+  // --- Выбор emoji ---
+  document.querySelectorAll('.emojiChoice').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedEmoji = el.textContent;
+    });
+  });
+  document.querySelectorAll('.emojiChoice')[0]?.classList.add('selected');
+
+  // --- Эффект от друга ---
+  socket.on('friendTouch', ({ x, y, emoji }) => {
+    friendTouches++;
+    updateCounter();
+    updateProgressModal();
+    checkReward();
+    const emojiEl = document.createElement('div');
+    emojiEl.className = 'heart';
+    emojiEl.textContent = emoji;
+    emojiEl.style.left = `${x - 20}px`;
+    emojiEl.style.top = `${y - 20}px`;
+    document.body.appendChild(emojiEl);
+    setTimeout(() => emojiEl.remove(), 1700);
+  });
+
+  // --- Обработка касаний и имён (полное обновление) ---
+  socket.on('touchesCount', ({ state }) => {
+    if (!state || !userId) return;
+    const me = state[userId];
+    myTouches = me?.count || 0;
+    myName = me?.name || userName;
+    myAvatar = me?.avatar || photoUrl;
+    const friendEntry = Object.entries(state).find(([id]) => id !== String(userId));
+    if (friendEntry) {
+      const [, friendData] = friendEntry;
+      friendTouches = friendData.count || 0;
+      friendName = friendData.name || 'Друг';
+      friendAvatar = friendData.avatar || '';
+    } else {
+      friendTouches = 0;
+      friendName = 'Друг';
+      friendAvatar = '';
+    }
+    updateCounter();
+    updateProgressModal();
+  });
+
 });
 
-// --- Обработка касаний и имён (полное обновление) ---
-socket.on('touchesCount', ({ state }) => {
-  if (!state || !userId) return;
-  const me = state[userId];
-  myTouches = me?.count || 0;
-  myName = me?.name || userName;
-  myAvatar = me?.avatar || photoUrl;
-  const friendEntry = Object.entries(state).find(([id]) => id !== String(userId));
-  if (friendEntry) {
-    const [, friendData] = friendEntry;
-    friendTouches = friendData.count || 0;
-    friendName = friendData.name || 'Друг';
-    friendAvatar = friendData.avatar || '';
-  } else {
-    friendTouches = 0;
-    friendName = 'Друг';
-    friendAvatar = '';
-  }
-  updateCounter();
-  updateProgressModal();
-});
 
 // --- Обработка касания ---
 function handleTouch(x, y, target) {
