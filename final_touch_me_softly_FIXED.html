@@ -1,0 +1,788 @@
+<!-- 💡 Это финальный HTML-код приложения Touch Me Softly -->
+<!-- Внутри находятся все элементы, стили и скрипты -->
+<!-- Каждый основной блок подписан, чтобы тебе было легче ориентироваться -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Touch Me Softly</title>
+  <style>
+    body {
+      position: relative;
+      margin: 0;
+      padding: 20px;
+     background-color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .heart {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      animation: floatUp 1.7s ease forwards;
+      opacity: 1;
+      z-index: 1000;
+      font-size: 35px;
+      line-height: 70px;
+      text-align: center;
+      user-select: none;
+    }
+    
+    #counter {
+      font-size: 18px;
+      background: #ffe6f0;
+      color: #d6336c;
+      border-radius: 16px;
+      padding: 12px 20px;
+      margin-bottom: 10px;
+      box-shadow: 0 6px 15px rgba(255, 182, 193, 0.6);
+      cursor: pointer;
+      position: relative;
+      z-index: 10;
+      width: fit-content;
+    }
+    #counter:hover {
+      background: #ffccdd;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      background: #fefefe;
+      border-radius: 20px;
+      width: 270px;
+      max-width: 90vw;
+      padding: 20px 22px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      font-size: 16px;
+      color: #111;
+      text-align: center;
+      box-sizing: border-box;
+      user-select: none;
+      word-wrap: break-word;
+      z-index: 11000 !important;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    .modal h2, .modal h3 {
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .modal p {
+      margin: 6px 0;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    .modal button {
+      margin-top: 18px;
+      background: #007aff;
+      border: none;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.25s ease;
+    }
+
+    .modal button:hover {
+      background: #005ecb;
+    }
+
+.gift-box {
+  font-size: 60px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  animation: pulseGift 2s infinite ease-in-out;
+}
+
+.gift-box:hover {
+  transform: scale(1.2) rotate(-5deg);
+  filter: brightness(1.2);
+}
+
+/* 🔁 Пульсация */
+@keyframes pulseGift {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
+}
+/* 🎬 Анимация открытия коробки */
+@keyframes boxOpen {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  50%  { transform: scale(1.4) rotate(10deg); }
+  100% { transform: scale(0) rotate(-30deg); opacity: 0; }
+}
+.gift-box.opened {
+  animation: boxOpen 0.6s ease forwards;
+}
+
+
+    @keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-30px) scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-80px) scale(1.7);
+    opacity: 0;
+  }
+}
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #rewardLoadingModal div {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    #rewardAvailableModal.show {
+      animation: zoomInFromFar 0.6s ease forwards;
+    }
+
+    #spinner {
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% {opacity: 0.8;}
+      50% {opacity: 0.4;}
+    }
+
+    @keyframes glow {
+      0% { text-shadow: 0 0 10px #d6336c;}
+      100% { text-shadow: 0 0 20px #ff90b3;}
+    }
+    
+    #helpModal {
+  font-size: 14px; 
+}
+    #emojiSelector {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 10px auto 4px;
+  gap: 5px;
+  max-width: 85%;
+  z-index: 1000;
+}
+
+.emojiChoice {
+  cursor: pointer;
+  font-size: 25px; /* уменьшено */
+  padding: 6px;
+  margin: 2px;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: transparent;
+}
+
+.emojiChoice.selected {
+  transform: scale(1.1); /* уменьшено */
+  box-shadow: 0 0 6px #ff69b4; /* уменьшено */
+  background: #fff0f5;
+}
+    
+@keyframes sway {
+  0%   { transform: translateX(0px) rotate(0deg); }
+  25%  { transform: translateX(-5px) rotate(-5deg); }
+  50%  { transform: translateX(0px) rotate(0deg); }
+  75%  { transform: translateX(5px) rotate(5deg); }
+  100% { transform: translateX(0px) rotate(0deg); }
+}
+    
+.dual-progress-container {
+  width: 100%;
+  height: 20px;
+  background: #fefefe;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  margin-top: 12px;
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+}
+.progress-part {
+  height: 100%;
+  transition: width 0.5s ease;
+  position: relative;
+  z-index: 1;
+}
+.my-part {
+  background: linear-gradient(135deg, #ff69b4, #ff1493);
+}
+.friend-part {
+  background: linear-gradient(135deg, #87cefa, #1e90ff);
+}
+.my-part::before,
+.friend-part::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: inherit;
+  border-radius: 50%;
+  animation: waveMotion 4s infinite linear;
+  opacity: 0.3;
+  transform: translateY(0) scaleX(1.5);
+  z-index: 0;
+}
+
+@keyframes waveMotion {
+  0%   { transform: translateX(0) translateY(0) scaleX(1.5); }
+  50%  { transform: translateX(-25%) translateY(-5%) scaleX(1.5); }
+  100% { transform: translateX(0) translateY(0) scaleX(1.5); }
+}
+
+  </style>
+</head>
+<body>
+  
+<button id="shareButton">🔗 Поделиться ссылкой</button>
+
+  <!-- Кнопка помощи -->
+<div id="helpButton" style="
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 42px;
+  height: 42px;
+  background: #ffb6c1;
+  border-radius: 50%;
+  color: white;
+  font-size: 26px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 9999;
+">?</div>
+
+<!-- Модалка помощи -->
+<div id="helpModal" class="modal">
+  <h3>ℹ️ О приложении</h3>
+  <p>
+    Отправляй касания и поцелуйчики на расстоянии другу или любимому человеку.<br>
+    Когда вместе наберёте <strong>1к, 2к, 3к...</strong> касаний, вас ждёт приятный сюрприз 💝
+  </p>
+  <button onclick="closeModal(helpModal)">Понятно</button>
+</div>
+
+ <div id="boxSelectionModal" class="modal">
+  <h3>🤩 Выберите одну из коробочек:</h3>
+  <div style="display: flex; justify-content: space-around; margin-top: 40px;">
+    <div class="gift-box" data-box="1">🎁</div>
+    <div class="gift-box" data-box="2">🎁</div>
+    <div class="gift-box" data-box="3">🎁</div>
+  </div>
+</div>
+  
+  <!-- Кнопка для создания записки -->
+<button id="noteButton" style="
+  margin-top: 8px;
+  margin-bottom: 6px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: #ff69b4;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+">💌 Написать записку</button>
+
+<!-- Модальное окно записи -->
+<div id="noteModal" class="modal" style="text-align: center;">
+  <h3 style="margin-bottom: 16px;">✍🏼 Оставить записку:</h3>
+  <textarea
+    id="noteText"
+    maxlength="140"
+    rows="4"
+    placeholder="Введите записку..."
+    style="width: 100%; max-width: 100%; padding: 10px; border-radius: 10px; resize: none; box-sizing: border-box;"
+  ></textarea>Отправить, когда достигнуто:</p>
+  <input
+    id="noteThreshold"
+    type="number"
+    min="1"
+    max="10000"
+    value="50"
+    style="width: 100%; max-width: 100%; padding: 10px; border-radius: 10px; box-sizing: border-box;"
+  />
+  <div style="margin-top: 20px; display: flex; justify-content: center; gap: 12px;">
+    <button id="saveNoteBtn">Сохранить</button>
+    <button onclick="closeModal(noteModal)" style="background: #ccc; color: #333;">Закрыть</button>
+  </div>
+</div>
+
+<!-- Модальное окно показа записки -->
+<div id="noteRevealModal" class="modal">
+  <h3>📩 Вам сообщение:</h3>
+  <p id="revealedNoteText"></p>
+  <button onclick="closeModal(noteRevealModal)">Ок</button>
+</div>
+  
+<div id="pulseDots" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
+  <svg width="80" height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="12" r="8" fill="#FF69B4">
+      <animate attributeName="r" values="8;12;8" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="12" r="8" fill="#FF69B4">
+      <animate attributeName="r" values="8;12;8" dur="1s" begin="0.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="70" cy="12" r="8" fill="#FF69B4">
+      <animate attributeName="r" values="8;12;8" dur="1s" begin="0.4s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+</div>
+  
+  <div id="emojiSelector">
+  <span class="emojiChoice">❤️</span>
+  <span class="emojiChoice">🌸</span>
+  <span class="emojiChoice">✨</span>
+  <span class="emojiChoice">💩</span>
+  <span class="emojiChoice">💋</span>
+  <span class="emojiChoice">🔥</span>
+</div>
+
+  
+  <div id="counter" role="button" aria-label="Счётчик касаний">Ты: 0 | Друг: 0</div>
+  
+<div id="progressModal" class="modal" role="dialog" aria-modal="true">
+  <h3 id="progressTitle">💖 Ваш прогресс</h3>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+    <div style="text-align: center;">
+      <img id="myAvatar" src="https://via.placeholder.com/32" alt="Ты" style="width: 32px; height: 32px; border-radius: 50%; margin-bottom: 4px;" />
+      <div id="myName" style="font-size: 14px;">Ты</div>
+    </div>
+    <div style="text-align: center;">
+      <img id="friendAvatar" src="https://via.placeholder.com/32" alt="Друг" style="width: 32px; height: 32px; border-radius: 50%; margin-bottom: 4px;" />
+      <div id="friendName" style="font-size: 14px;">Друг</div>
+    </div>
+  </div>
+  <p id="progressSummary">Ты: 0 | Друг: 0</p>
+  <div class="dual-progress-container">
+    <div id="myProgress" class="progress-part my-part"></div>
+    <div id="friendProgress" class="progress-part friend-part"></div>
+  </div>
+  <p style="margin-top: 8px; font-size: 16px; color: #888;" id="progressText">0 / 1000</p>
+  <button id="closeProgressBtn">Ок</button>
+</div>
+
+  <div id="rewardAvailableModal" class="modal">
+    <h2>🎉 Поздравляем!</h2>
+    <p>Вы собрали <strong>1000 касаний</strong><br>Вам доступен подарок!</p>
+    <button id="openRewardBtn">Получить</button>
+  </div>
+
+  <div id="rewardLoadingModal" class="modal">
+    <h2>🔥 Загрузка...</h2>
+    <div style="margin-top: 20px; font-size: 24px;">⏳</div>
+  </div>
+
+  <div id="rewardResultModal" class="modal">
+    <h2>Ура! 🎉</h2>
+    <p id="rewardResultText">Вам выпал Telegram Premium на 3 месяца!</p>
+    <button id="closeRewardBtn">Активировать</button>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    // --- ОБЩИЕ ПЕРЕМЕННЫЕ ---
+  let myTouches = 0;
+  let friendTouches = 0;
+  let totalTouches = 0;
+  let touchCooldown = false;
+  let isModalOpen = false;   // <-- объявляем перед использованием
+  let savedNote = null;
+  let noteThreshold = 0;
+  let noteShown = false;
+  let rewardClaimed = false;
+  let selectedEmoji = '❤️';
+    let confettiWrappers = [];
+
+
+  // --- ЭЛЕМЕНТЫ DOM ---
+  const counter = document.getElementById('counter');
+  const progressModal = document.getElementById('progressModal');
+  const rewardAvailableModal = document.getElementById('rewardAvailableModal');
+  const rewardLoadingModal = document.getElementById('rewardLoadingModal');
+  const rewardResultModal = document.getElementById('rewardResultModal');
+  const noteModal = document.getElementById('noteModal');
+  const noteRevealModal = document.getElementById('noteRevealModal');
+
+  const progressSummary = document.getElementById('progressSummary');
+  const progressText    = document.getElementById('progressText');
+  const myProgress      = document.getElementById('myProgress');
+  const friendProgress  = document.getElementById('friendProgress');
+
+  const closeProgressBtn = document.getElementById('closeProgressBtn');
+  const openRewardBtn    = document.getElementById('openRewardBtn');
+  const closeRewardBtn   = document.getElementById('closeRewardBtn');
+  const saveNoteBtn      = document.getElementById('saveNoteBtn');
+  const noteTextElm      = document.getElementById('noteText');
+  const noteThresholdEl  = document.getElementById('noteThreshold');
+
+  const helpButton = document.getElementById('helpButton');
+  const helpModal   = document.getElementById('helpModal');
+const noteButton = document.getElementById('noteButton');
+noteButton.onclick = () => openModal(noteModal);
+
+    document.getElementById("shareButton").onclick = () => {
+  const roomId = generateRoomId();
+  const botUsername = "Vap14_robot"; // 👈 замени на username своего бота
+  const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    alert("Ссылка скопирована:\n" + shareUrl);
+  });
+};
+function generateRoomId() {
+  return Math.random().toString(36).substring(2, 8);
+}
+
+  // --- ФУНКЦИИ МОДАЛОК ---
+  function openModal(modal) {
+    updateProgressModal();  // гарантируем, что перед прогрессом всё обновлено
+    isModalOpen = true;
+    modal.classList.add('show');
+  }
+  function closeModal(modal) {
+    isModalOpen = false;
+    modal.classList.remove('show');
+  }
+
+  // --- ОБНОВЛЕНИЕ СЧЁТЧИКА И ПРОГРЕССА ---
+  function updateCounter() {
+  const friendName = window.friendName || 'Друг';
+  counter.textContent = `Ты: ${myTouches} | ${friendName}: ${friendTouches}`;
+}
+function updateProgressModal() {
+  totalTouches = myTouches + friendTouches;
+  const friendName = window.friendName || 'Друг';
+  const friendAvatar = window.friendAvatar || 'https://via.placeholder.com/32';
+  // Обновление текста
+  progressSummary.innerHTML = `
+    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <span style="display:flex;align-items:center;gap:6px;">
+        <img src="${photoUrl}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${userName}: ${myTouches}
+      </span>
+      |
+      <span style="display:flex;align-items:center;gap:6px;">
+        <img src="${friendAvatar}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${friendName}: ${friendTouches}
+      </span>
+    </div>
+  `;
+  progressText.textContent = `${totalTouches} / 1000`;
+  const max = 1000;
+  myProgress.style.width = `${Math.min(myTouches / max * 100, 100)}%`;
+  friendProgress.style.width = `${Math.min(friendTouches / max * 100, 100)}%`;
+}
+
+  // --- ОБРАБОТКА ЗАПИСОК И ПОДАРКОВ ---
+  saveNoteBtn.onclick = () => {
+    const text = noteTextElm.value.trim();
+    const thr  = parseInt(noteThresholdEl.value, 10);
+    if (text && thr > 0) {
+      savedNote    = text;
+      noteThreshold = thr;
+      closeModal(noteModal);
+      alert(`✉️ Записка сохранена. Появится при ${thr} касаниях.`);
+    }
+  };
+
+  function checkReward() {
+    totalTouches = myTouches + friendTouches;
+    if (totalTouches >= 1000 && !rewardClaimed) {
+      openModal(rewardAvailableModal);
+    }
+    if (savedNote && totalTouches >= noteThreshold && !noteShown) {
+      document.getElementById('revealedNoteText').textContent = savedNote;
+      openModal(noteRevealModal);
+      noteShown = true;
+    }
+  }
+
+  // --- ОБРАБОТКА КНОПОК И СОБЫТИЙ ---
+closeProgressBtn.onclick = () => closeModal(progressModal);
+openRewardBtn.onclick = () => {
+  closeModal(rewardAvailableModal);
+  openModal(rewardLoadingModal);
+  setTimeout(() => {
+    closeModal(rewardLoadingModal);
+    openModal(document.getElementById('boxSelectionModal'));
+  }, 2000);
+};
+closeRewardBtn.onclick = () => {
+  rewardClaimed = true;
+  closeModal(rewardResultModal);
+  const spinner = document.createElement('div');
+  spinner.id = 'customSpinner';
+  spinner.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20000;
+  `;
+  spinner.innerHTML = `
+    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
+      <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
+        stroke-dasharray="164.93361431346415 56.97787143782138">
+        <animateTransform attributeName="transform" type="rotate"
+          repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
+      </circle>
+    </svg>
+  `;
+  document.body.appendChild(spinner);
+  setTimeout(() => {
+    document.getElementById('customSpinner')?.remove();
+    alert('Подарок активирован! 🎁');
+  }, 2000);
+};
+
+helpButton.onclick = () => openModal(helpModal);
+counter.onclick = () => openModal(progressModal);
+
+    let animationPlayed = false;
+document.querySelectorAll('.gift-box').forEach(box => {
+  box.addEventListener('click', () => {
+    document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
+    box.classList.add('opened');
+    if (animationPlayed) return;
+    animationPlayed = true;
+
+    closeModal(document.getElementById('boxSelectionModal'));
+
+    const dotsLoader = document.createElement('div');
+    dotsLoader.id = 'dotsLoader';
+    dotsLoader.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20000;
+      display: flex;
+      gap: 5px;
+    `;
+    dotsLoader.innerHTML = `
+      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite;"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.2s;"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.4s;"></span>
+      <style>
+        @keyframes blink {
+          0%, 80%, 100% { opacity: 0; }
+          40% { opacity: 1; }
+        }
+      </style>
+    `;
+    document.body.appendChild(dotsLoader);
+    setTimeout(() => {
+      document.getElementById('dotsLoader')?.remove();
+      document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
+      startConfettiBurst();
+      openModal(rewardResultModal);
+      document.querySelectorAll('.gift-box').forEach(b => {
+        b.classList.remove('opened');
+        b.style.pointerEvents = 'auto';
+      });
+    }, 2000);
+  });
+});
+
+    // --- WebSocket и инициализация ---
+const tgUser = Telegram.WebApp?.initDataUnsafe?.user || {};
+const roomId = Telegram.WebApp?.initDataUnsafe?.start_param || 'default_room';
+const userId = tgUser.id;
+const userName = tgUser.first_name || 'Ты';
+const photoUrl = tgUser.photo_url || 'https://via.placeholder.com/32';
+const socket = io('https://immense-fantasy-turret.glitch.me');
+// 👥 Переменные для отображения имени и аватарки
+let friendName = 'Друг';
+let friendAvatar = '';
+let myName = userName;
+let myAvatar = photoUrl;
+socket.on('connect', () => {
+  socket.emit('joinRoom', {
+    roomId,
+    userId,
+    name: userName,
+    avatar: photoUrl
+  });
+});
+// --- Выбор emoji ---
+document.querySelectorAll('.emojiChoice').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedEmoji = el.textContent;
+  });
+});
+document.querySelectorAll('.emojiChoice')[0]?.classList.add('selected');
+// --- Эффект от друга ---
+socket.on('friendTouch', ({ x, y, emoji }) => {
+  friendTouches++;
+  updateCounter();
+  updateProgressModal();
+  checkReward();
+  const emojiEl = document.createElement('div');
+  emojiEl.className = 'heart';
+  emojiEl.textContent = emoji;
+  emojiEl.style.left = `${x - 20}px`;
+  emojiEl.style.top = `${y - 20}px`;
+  document.body.appendChild(emojiEl);
+  setTimeout(() => emojiEl.remove(), 1700);
+});
+// --- Обработка касаний и имён ---
+socket.on('touchesCount', ({ total, state }) => {
+  if (!state || !userId) return;
+  // Твои данные
+  const me = state[userId];
+  myTouches = me?.count || 0;
+  myName = me?.name || 'Ты';
+  myAvatar = me?.avatar || photoUrl;
+  // Данные друга
+  const friendEntry = Object.entries(state).find(([id]) => id !== String(userId));
+  if (friendEntry) {
+    const [, friendData] = friendEntry;
+    friendTouches = friendData.count || 0;
+    friendName = friendData.name || 'Друг';
+    friendAvatar = friendData.avatar || '';
+  } else {
+    friendTouches = 0;
+    friendName = 'Друг';
+    friendAvatar = '';
+  }
+  updateCounter();
+  updateProgressModal();
+});
+    
+// --- Обработка касания ---
+function handleTouch(x, y, target) {
+  if (touchCooldown || isModalOpen) return;
+  const forbidden = ['modal', 'emojiSelector', 'emojiChoice', 'gift-box'];
+  if (
+    forbidden.some(cls => target.closest(`.${cls}`)) ||
+    ['counter', 'helpButton'].includes(target.id) ||
+    target.closest('button')
+  ) return;
+  touchCooldown = true;
+  setTimeout(() => touchCooldown = false, 100);
+  myTouches++;
+  updateCounter();
+  updateProgressModal();
+  checkReward();
+  const emoji = document.createElement('div');
+  emoji.className = 'heart';
+  emoji.textContent = selectedEmoji;
+  emoji.style.left = `${x - 20}px`;
+  emoji.style.top = `${y - 20}px`;
+  document.body.appendChild(emoji);
+  setTimeout(() => emoji.remove(), 1700);
+  socket.emit('touch', {
+    roomId,
+    userId,
+    x,
+    y,
+    emoji: selectedEmoji
+  });
+}
+document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
+    
+function startConfettiBurst() {
+  const NUM_CONFETTI = 320;
+  const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
+  if (!document.getElementById('confetti-3d-style')) {
+    const style = document.createElement('style');
+    style.id = 'confetti-3d-style';
+    style.innerHTML = `
+      @keyframes confettiExplode {
+        to {
+          transform: translate(var(--x), var(--y)) rotateZ(var(--rz)) rotateY(var(--ry));
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  for (let i = 0; i < NUM_CONFETTI; i++) {
+    const confetti = document.createElement('div');
+    const size = 6 + Math.random() * 12;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    // Случайная траектория
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = 300 + Math.random() * 500;
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+    const rz = `${Math.random() * 720 - 360}deg`;
+    const ry = `${Math.random() * 180 - 90}deg`;
+    const duration = 1.5 + Math.random() * 0.8;
+    confetti.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: ${size}px;
+      height: ${size * 0.5}px;
+      background-color: ${color};
+      opacity: 1;
+      border-radius: 1px;
+      transform: translate(0, 0) rotateZ(0deg);
+      animation: confettiExplode ${duration}s ease-out forwards;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    `;
+    confetti.style.setProperty('--x', `${x}px`);
+    confetti.style.setProperty('--y', `${y}px`);
+    confetti.style.setProperty('--rz', rz);
+    confetti.style.setProperty('--ry', ry);
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), duration * 1000 + 100);
+  }
+}
+
+  </script>
+</body>
+</html>
