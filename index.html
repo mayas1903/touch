@@ -274,6 +274,8 @@
   </style>
 </head>
 <body>
+  
+<button id="shareButton">🔗 Поделиться ссылкой</button>
 
   <!-- Кнопка помощи -->
 <div id="helpButton" style="
@@ -455,6 +457,18 @@
   const helpModal   = document.getElementById('helpModal');
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
+
+    document.getElementById("shareButton").onclick = () => {
+  const roomId = generateRoomId();
+  const botUsername = "YourBotUsername"; // 👈 замени на username своего бота
+  const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    alert("Ссылка скопирована:\n" + shareUrl);
+  });
+};
+function generateRoomId() {
+  return Math.random().toString(36).substring(2, 8);
+}
 
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
@@ -640,7 +654,7 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
 
   // --- WEBSOCKET + ЭМОДЗИ ---
   const socket = io('https://immense-fantasy-turret.glitch.me');
-  const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
+  const roomId = Telegram.WebApp?.initDataUnsafe?.start_param || 'default_room';
    socket.on('connect', () => {
     socket.emit('joinRoom', roomId);
     document.querySelectorAll('.emojiChoice').forEach(el => {
