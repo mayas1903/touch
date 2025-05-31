@@ -467,17 +467,16 @@
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
-    document.getElementById("shareButton").onclick = () => {
-  const roomId = generateRoomId();
-  const botUsername = "Vap14_robot"; // 👈 замени на username своего бота
+ document.getElementById("shareButton").onclick = () => {
+  const botUsername = "Vap14_robot"; // 👈 замени на своего
+  const tgUser = Telegram.WebApp.initDataUnsafe.user;
+  // Надёжный постоянный roomId
+  const roomId = tgUser.username || `id${tgUser.id}`;
   const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
   navigator.clipboard.writeText(shareUrl).then(() => {
     alert("Ссылка скопирована:\n" + shareUrl);
   });
 };
-function generateRoomId() {
-  return Math.random().toString(36).substring(2, 8);
-}
 
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
@@ -492,22 +491,21 @@ function generateRoomId() {
 
   // --- ОБНОВЛЕНИЕ СЧЁТЧИКА И ПРОГРЕССА ---
   function updateCounter() {
-  const friendName = window.friendName || 'Друг';
-  counter.textContent = `Ты: ${myTouches} | ${friendName}: ${friendTouches}`;
+  const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
+  counter.textContent = `Ты: ${myTouches} | ${friendDisplayName}: ${friendTouches}`;
 }
 function updateProgressModal() {
   totalTouches = myTouches + friendTouches;
-  const friendName = window.friendName || 'Друг';
-  const friendAvatar = window.friendAvatar || 'https://via.placeholder.com/32';
-  // Обновление текста
+  const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
+  const friendDisplayAvatar = typeof friendAvatar !== 'undefined' ? friendAvatar : 'https://via.placeholder.com/32';
   progressSummary.innerHTML = `
     <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
       <span style="display:flex;align-items:center;gap:6px;">
-        <img src="${photoUrl}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${userName}: ${myTouches}
+        <img src="${photoUrl}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${myName}: ${myTouches}
       </span>
       |
       <span style="display:flex;align-items:center;gap:6px;">
-        <img src="${friendAvatar}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${friendName}: ${friendTouches}
+        <img src="${friendDisplayAvatar}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${friendDisplayName}: ${friendTouches}
       </span>
     </div>
   `;
@@ -630,7 +628,6 @@ document.querySelectorAll('.gift-box').forEach(box => {
 
 // --- WebSocket и инициализация (с резервом для браузера) ---
 const isTelegram = typeof Telegram !== 'undefined' && Telegram.WebApp?.initDataUnsafe?.user;
-
 const tgUser = isTelegram
   ? Telegram.WebApp.initDataUnsafe.user
   : {
@@ -647,10 +644,13 @@ const urlRoomId = urlParams.get('roomId');
 const viaLink = !!urlRoomId;
 const savedPairRoom = localStorage.getItem('pairRoomId');
 
+// Уникальный roomId для текущего пользователя (постоянный)
+const permanentRoomId = tgUser.username || `id${tgUser.id}`;
+
 // Выбираем roomId:
-// если по ссылке — из ссылки
-// иначе — либо сохранённая комната пары, либо дефолт
-const roomId = viaLink ? urlRoomId : (savedPairRoom || ('demo_room_' + tgUser.id));
+// если по ссылке — берём из ссылки
+// иначе — либо сохранённая комната пары, либо постоянная
+const roomId = viaLink ? urlRoomId : (savedPairRoom || permanentRoomId);
 
 const userId = tgUser.id;
 const userName = tgUser.first_name || 'Ты';
@@ -663,6 +663,7 @@ let friendName = 'Друг';
 let friendAvatar = '';
 let myName = userName;
 let myAvatar = photoUrl;
+
 socket.on('connect', () => {
   console.log('📡 WebSocket подключён');
   socket.emit('joinRoom', {
@@ -686,7 +687,6 @@ socket.on('initialData', ({ my, friend }) => {
     friendTouches = friend.count || 0;
 
     // Сохраняем комнату пары только если вход был по ссылке
-    // чтобы при следующем заходе без ссылки войти в ту же пару
     if (viaLink) {
       localStorage.setItem('pairRoomId', roomId);
       console.log('✅ Пара сохранена:', roomId);
@@ -700,6 +700,7 @@ socket.on('initialData', ({ my, friend }) => {
   updateCounter();
   updateProgressModal();
 });
+
 
 // --- Выбор emoji ---
 document.querySelectorAll('.emojiChoice').forEach(el => {
