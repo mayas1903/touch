@@ -439,7 +439,8 @@
   let rewardClaimed = false;
   let selectedEmoji = '❤️';
     let confettiWrappers = [];
-
+let tgUser, roomId, userId, userName, photoUrl;
+let socket;
 
   // --- ЭЛЕМЕНТЫ DOM ---
   const counter = document.getElementById('counter');
@@ -467,31 +468,39 @@
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
+let tgUser = null; // глобально, если нужно использовать ещё где-то
+
 window.addEventListener('DOMContentLoaded', () => {
   const shareBtn = document.getElementById("shareButton");
-
   if (!shareBtn) return;
 
-  // Telegram WebApp доступен?
+  // Проверка доступности Telegram WebApp
   if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
     console.warn("❌ Telegram WebApp недоступен");
     return;
   }
-  Telegram.WebApp.ready(); // <-- Обязательно!
-  const tgUser = Telegram.WebApp.initDataUnsafe?.user;
-console.log('👤 Telegram User:', tgUser);
 
-  if (!tgUser) {
+  // Инициализация Telegram WebApp
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+
+  tgUser = Telegram.WebApp.initDataUnsafe?.user;
+  console.log('👤 Telegram User:', tgUser);
+
+  if (!tgUser || !tgUser.id) {
     console.warn("❌ Telegram user не получен");
     return;
   }
+
+  // Обработка клика на кнопку "Поделиться"
   shareBtn.onclick = () => {
     const botUsername = "Vap14_robot";
     const roomId = tgUser.username || `id${tgUser.id}`;
     const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
+
     Telegram.WebApp.showPopup({
       title: "🔗 Поделиться ссылкой",
-      message: `Вот твоя ссылка:\n${shareUrl}`,
+      message: `Вот твоя уникальная ссылка:\n${shareUrl}`,
       buttons: [
         { type: "copy", text: "Скопировать" },
         { type: "close", text: "Закрыть" }
@@ -499,8 +508,6 @@ console.log('👤 Telegram User:', tgUser);
     });
   };
 });
-
-
 
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
