@@ -274,8 +274,6 @@
   </style>
 </head>
 <body>
-  
-<button id="shareButton">🔗 Поделиться ссылкой</button>
 
   <!-- Кнопка помощи -->
 <div id="helpButton" style="
@@ -387,18 +385,8 @@
   
   <div id="counter" role="button" aria-label="Счётчик касаний">Ты: 0 | Друг: 0</div>
   
-<div id="progressModal" class="modal" role="dialog" aria-modal="true">
+  <div id="progressModal" class="modal" role="dialog" aria-modal="true">
   <h3 id="progressTitle">💖 Ваш прогресс</h3>
-  <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
-    <div style="text-align: center;">
-      <img id="myAvatar" src="https://via.placeholder.com/32" alt="Ты" style="width: 32px; height: 32px; border-radius: 50%; margin-bottom: 4px;" />
-      <div id="myName" style="font-size: 14px;">Ты</div>
-    </div>
-    <div style="text-align: center;">
-      <img id="friendAvatar" src="https://via.placeholder.com/32" alt="Друг" style="width: 32px; height: 32px; border-radius: 50%; margin-bottom: 4px;" />
-      <div id="friendName" style="font-size: 14px;">Друг</div>
-    </div>
-  </div>
   <p id="progressSummary">Ты: 0 | Друг: 0</p>
   <div class="dual-progress-container">
     <div id="myProgress" class="progress-part my-part"></div>
@@ -407,6 +395,7 @@
   <p style="margin-top: 8px; font-size: 16px; color: #888;" id="progressText">0 / 1000</p>
   <button id="closeProgressBtn">Ок</button>
 </div>
+
 
   <div id="rewardAvailableModal" class="modal">
     <h2>🎉 Поздравляем!</h2>
@@ -439,8 +428,7 @@
   let rewardClaimed = false;
   let selectedEmoji = '❤️';
     let confettiWrappers = [];
-let tgUser, roomId, userId, userName, photoUrl;
-let socket;
+
 
   // --- ЭЛЕМЕНТЫ DOM ---
   const counter = document.getElementById('counter');
@@ -468,93 +456,9 @@ let socket;
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
-let tgUser, roomId, userId, userName, photoUrl, socket;
-
-window.addEventListener('DOMContentLoaded', () => {
-  // Проверка Telegram WebApp
-  if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
-    console.warn("❌ Telegram WebApp недоступен");
-    return;
-  }
-
-  Telegram.WebApp.ready();
-  Telegram.WebApp.expand();
-
-  tgUser = Telegram.WebApp.initDataUnsafe?.user;
-  if (!tgUser || !tgUser.id) {
-    console.warn("❌ Не удалось получить пользователя Telegram");
-    return;
-  }
-
-  console.log("👤 TG user:", tgUser);
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlRoomId = urlParams.get('roomId');
-  const viaLink = !!urlRoomId;
-  const savedPairRoom = localStorage.getItem('pairRoomId');
-
-  roomId = viaLink ? urlRoomId : (savedPairRoom || (tgUser.username || `id${tgUser.id}`));
-  userId = tgUser.id;
-  userName = tgUser.first_name || "Ты";
-  photoUrl = tgUser.photo_url || "https://via.placeholder.com/32";
-
-  socket = io("https://immense-fantasy-turret.glitch.me");
-
-  socket.on("connect", () => {
-    console.log("📡 WebSocket подключён");
-    socket.emit("joinRoom", {
-      roomId,
-      userId,
-      name: userName,
-      avatar: photoUrl,
-      viaLink
-    });
-  });
-
-  socket.on("initialData", ({ my, friend }) => {
-    myTouches = my.count || 0;
-    myName = my.name || userName;
-    myAvatar = my.avatar || photoUrl;
-
-    if (friend) {
-      friendName = friend.name || "Друг";
-      friendAvatar = friend.avatar || "";
-      friendTouches = friend.count || 0;
-
-      if (viaLink) {
-        localStorage.setItem("pairRoomId", roomId);
-        console.log("✅ Пара сохранена:", roomId);
-      }
-    } else {
-      friendName = "Друг";
-      friendAvatar = "";
-      friendTouches = 0;
-    }
-
-    updateCounter();
-    updateProgressModal();
-  });
-
-  // Кнопка Поделиться
-  const shareBtn = document.getElementById("shareButton");
-  if (shareBtn) {
-    shareBtn.onclick = () => {
-      const botUsername = "Vap14_robot";
-      const shareLink = `https://t.me/${botUsername}?startapp=${roomId}`;
-      Telegram.WebApp.showPopup({
-        title: "🔗 Поделиться",
-        message: `Вот твоя ссылка:\n${shareLink}`,
-        buttons: [
-          { type: "copy", text: "Скопировать" },
-          { type: "close", text: "Закрыть" }
-        ]
-      });
-    };
-  }
-
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
-    updateProgressModal();
+    updateProgressModal();  // гарантируем, что перед прогрессом всё обновлено
     isModalOpen = true;
     modal.classList.add('show');
   }
@@ -565,37 +469,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // --- ОБНОВЛЕНИЕ СЧЁТЧИКА И ПРОГРЕССА ---
   function updateCounter() {
-    const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
-    counter.textContent = `Ты: ${myTouches} | ${friendDisplayName}: ${friendTouches}`;
+    counter.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
   }
-
   function updateProgressModal() {
     totalTouches = myTouches + friendTouches;
-    const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
-    const friendDisplayAvatar = typeof friendAvatar !== 'undefined' ? friendAvatar : 'https://via.placeholder.com/32';
-    progressSummary.innerHTML = `
-      <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
-        <span style="display:flex;align-items:center;gap:6px;">
-          <img src="${photoUrl}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${myName}: ${myTouches}
-        </span>
-        |
-        <span style="display:flex;align-items:center;gap:6px;">
-          <img src="${friendDisplayAvatar}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${friendDisplayName}: ${friendTouches}
-        </span>
-      </div>
-    `;
-    progressText.textContent = `${totalTouches} / 1000`;
+    progressSummary.textContent = `Ты: ${myTouches} | Друг: ${friendTouches}`;
+    progressText.textContent    = `${totalTouches} / 1000`;
     const max = 1000;
-    myProgress.style.width = `${Math.min(myTouches / max * 100, 100)}%`;
+    myProgress.style.width     = `${Math.min(myTouches / max * 100, 100)}%`;
     friendProgress.style.width = `${Math.min(friendTouches / max * 100, 100)}%`;
   }
 
   // --- ОБРАБОТКА ЗАПИСОК И ПОДАРКОВ ---
   saveNoteBtn.onclick = () => {
     const text = noteTextElm.value.trim();
-    const thr = parseInt(noteThresholdEl.value, 10);
+    const thr  = parseInt(noteThresholdEl.value, 10);
     if (text && thr > 0) {
-      savedNote = text;
+      savedNote    = text;
       noteThreshold = thr;
       closeModal(noteModal);
       alert(`✉️ Записка сохранена. Появится при ${thr} касаниях.`);
@@ -615,112 +505,122 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- ОБРАБОТКА КНОПОК И СОБЫТИЙ ---
-  closeProgressBtn.onclick = () => closeModal(progressModal);
-  openRewardBtn.onclick = () => {
-    closeModal(rewardAvailableModal);
-    openModal(rewardLoadingModal);
-    setTimeout(() => {
-      closeModal(rewardLoadingModal);
-      openModal(document.getElementById('boxSelectionModal'));
-    }, 2000);
-  };
-  closeRewardBtn.onclick = () => {
-    rewardClaimed = true;
-    closeModal(rewardResultModal);
-    const spinner = document.createElement('div');
-    spinner.id = 'customSpinner';
-    spinner.style.cssText = `
+closeProgressBtn.onclick = () => closeModal(progressModal);
+
+openRewardBtn.onclick = () => {
+  closeModal(rewardAvailableModal);
+  openModal(rewardLoadingModal);
+  setTimeout(() => {
+    closeModal(rewardLoadingModal);
+    openModal(document.getElementById('boxSelectionModal'));
+  }, 2000);
+};
+
+closeRewardBtn.onclick = () => {
+  rewardClaimed = true;
+  closeModal(rewardResultModal);
+
+  const spinner = document.createElement('div');
+  spinner.id = 'customSpinner';
+  spinner.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20000;
+  `;
+  spinner.innerHTML = `
+    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
+      <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
+        stroke-dasharray="164.93361431346415 56.97787143782138">
+        <animateTransform attributeName="transform" type="rotate"
+          repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
+      </circle>
+    </svg>
+  `;
+  document.body.appendChild(spinner);
+
+  setTimeout(() => {
+    document.getElementById('customSpinner')?.remove();
+    alert('Подарок активирован! 🎁');
+  }, 2000);
+};
+
+helpButton.onclick = () => openModal(helpModal);
+counter.onclick = () => openModal(progressModal);
+
+    let animationPlayed = false;
+document.querySelectorAll('.gift-box').forEach(box => {
+  box.addEventListener('click', () => {
+    document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
+    box.classList.add('opened');
+    if (animationPlayed) return;
+    animationPlayed = true;
+
+    closeModal(document.getElementById('boxSelectionModal'));
+
+    const dotsLoader = document.createElement('div');
+    dotsLoader.id = 'dotsLoader';
+    dotsLoader.style.cssText = `
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 20000;
+      display: flex;
+      gap: 5px;
     `;
-    spinner.innerHTML = `
-      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
-        <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
-          stroke-dasharray="164.93361431346415 56.97787143782138">
-          <animateTransform attributeName="transform" type="rotate"
-            repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
-        </circle>
-      </svg>
+    dotsLoader.innerHTML = `
+      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite;"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.2s;"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.4s;"></span>
+      <style>
+        @keyframes blink {
+          0%, 80%, 100% { opacity: 0; }
+          40% { opacity: 1; }
+        }
+      </style>
     `;
-    document.body.appendChild(spinner);
+    document.body.appendChild(dotsLoader);
     setTimeout(() => {
-      document.getElementById('customSpinner')?.remove();
-      alert('Подарок активирован! 🎁');
+      document.getElementById('dotsLoader')?.remove();
+      document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
+      startConfettiBurst();
+      openModal(rewardResultModal);
+      document.querySelectorAll('.gift-box').forEach(b => {
+        b.classList.remove('opened');
+        b.style.pointerEvents = 'auto';
+      });
     }, 2000);
-  };
-
-  helpButton.onclick = () => openModal(helpModal);
-  counter.onclick = () => openModal(progressModal);
-
-  let animationPlayed = false;
-  document.querySelectorAll('.gift-box').forEach(box => {
-    box.addEventListener('click', () => {
-      document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
-      box.classList.add('opened');
-      if (animationPlayed) return;
-      animationPlayed = true;
-
-      closeModal(document.getElementById('boxSelectionModal'));
-
-      const dotsLoader = document.createElement('div');
-      dotsLoader.id = 'dotsLoader';
-      dotsLoader.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 20000;
-        display: flex;
-        gap: 5px;
-      `;
-      dotsLoader.innerHTML = `
-        <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite;"></span>
-        <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.2s;"></span>
-        <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.4s;"></span>
-        <style>
-          @keyframes blink {
-            0%, 80%, 100% { opacity: 0; }
-            40% { opacity: 1; }
-          }
-        </style>
-      `;
-      document.body.appendChild(dotsLoader);
-      setTimeout(() => {
-        document.getElementById('dotsLoader')?.remove();
-        document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
-        startConfettiBurst();
-        openModal(rewardResultModal);
-        document.querySelectorAll('.gift-box').forEach(b => {
-          b.classList.remove('opened');
-          b.style.pointerEvents = 'auto';
-        });
-      }, 2000);
-    });
   });
 });
 
-// --- Обработка касания ---
-function handleTouch(x, y, target) {
-  if (touchCooldown || isModalOpen) return;
 
-  const forbidden = ['modal', 'emojiSelector', 'emojiChoice', 'gift-box'];
+    // Выбор emoji
+document.querySelectorAll('.emojiChoice').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedEmoji = el.textContent;
+  });
+});
+    
+  // --- ОБРАБОТЧИК КАСАНИЙ ---
+  function handleTouch(x, y, target) {
+  if (touchCooldown || isModalOpen) return;
+  const forbidden = ['modal','emojiSelector','emojiChoice','gift-box'];
   if (
     forbidden.some(cls => target.closest(`.${cls}`)) ||
-    ['counter', 'helpButton'].includes(target.id) ||
+    ['counter','helpButton'].includes(target.id) ||
     target.closest('button')
   ) return;
-
   touchCooldown = true;
-  setTimeout(() => (touchCooldown = false), 100);
-
+  setTimeout(() => touchCooldown = false, 100);
   myTouches++;
   updateCounter();
   updateProgressModal();
-  checkReward();
-
+  checkReward(); 
+  // 🆕 Добавляем визуальный эмодзи
   const emoji = document.createElement('div');
   emoji.className = 'heart';
   emoji.textContent = selectedEmoji;
@@ -728,21 +628,49 @@ function handleTouch(x, y, target) {
   emoji.style.top = `${y - 20}px`;
   document.body.appendChild(emoji);
   setTimeout(() => emoji.remove(), 1700);
-
-  socket.emit('touch', {
+    socket.emit('touch', {
     roomId,
-    userId,
     x,
     y,
     emoji: selectedEmoji
   });
 }
 
-document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
-    
+  document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
+
+  // --- WEBSOCKET + ЭМОДЗИ ---
+  const socket = io('https://immense-fantasy-turret.glitch.me');
+  const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
+   socket.on('connect', () => {
+    socket.emit('joinRoom', roomId);
+    document.querySelectorAll('.emojiChoice').forEach(el => {
+      el.onclick = () => {
+        selectedEmoji = el.textContent;
+        document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+      };
+    });
+    document.querySelectorAll('.emojiChoice')[0].classList.add('selected');
+  });
+  socket.on('friendTouch', ({x, y, emoji}) => {
+  friendTouches++;
+  updateCounter();
+  updateProgressModal();
+  checkReward();
+  // Показываем эмодзи от друга
+  const emojiEl = document.createElement('div');
+  emojiEl.className = 'heart';
+  emojiEl.textContent = emoji;
+  emojiEl.style.left = `${x - 20}px`;
+  emojiEl.style.top = `${y - 20}px`;
+  document.body.appendChild(emojiEl);
+  setTimeout(() => emojiEl.remove(), 1700);
+});
+
 function startConfettiBurst() {
   const NUM_CONFETTI = 320;
   const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
+
   if (!document.getElementById('confetti-3d-style')) {
     const style = document.createElement('style');
     style.id = 'confetti-3d-style';
@@ -756,18 +684,22 @@ function startConfettiBurst() {
     `;
     document.head.appendChild(style);
   }
+
   for (let i = 0; i < NUM_CONFETTI; i++) {
     const confetti = document.createElement('div');
     const size = 6 + Math.random() * 12;
     const color = colors[Math.floor(Math.random() * colors.length)];
+    
     // Случайная траектория
     const angle = Math.random() * 2 * Math.PI;
     const distance = 300 + Math.random() * 500;
     const x = Math.cos(angle) * distance;
     const y = Math.sin(angle) * distance;
+
     const rz = `${Math.random() * 720 - 360}deg`;
     const ry = `${Math.random() * 180 - 90}deg`;
     const duration = 1.5 + Math.random() * 0.8;
+
     confetti.style.cssText = `
       position: fixed;
       top: 50%;
@@ -783,11 +715,14 @@ function startConfettiBurst() {
       pointer-events: none;
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
     `;
+
     confetti.style.setProperty('--x', `${x}px`);
     confetti.style.setProperty('--y', `${y}px`);
     confetti.style.setProperty('--rz', rz);
     confetti.style.setProperty('--ry', ry);
+
     document.body.appendChild(confetti);
+
     setTimeout(() => confetti.remove(), duration * 1000 + 100);
   }
 }
