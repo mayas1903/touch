@@ -460,7 +460,7 @@ noteButton.onclick = () => openModal(noteModal);
 
     document.getElementById("shareButton").onclick = () => {
   const roomId = generateRoomId();
-  const botUsername = "YourBotUsername"; // 👈 замени на username своего бота
+  const botUsername = "Vap14_robot"; // 👈 замени на username своего бота
   const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
   navigator.clipboard.writeText(shareUrl).then(() => {
     alert("Ссылка скопирована:\n" + shareUrl);
@@ -653,10 +653,14 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
 
   // --- WEBSOCKET + ЭМОДЗИ ---
-  const socket = io('https://immense-fantasy-turret.glitch.me');
-  const roomId = Telegram.WebApp?.initDataUnsafe?.start_param || 'default_room';
+const socket = io('https://immense-fantasy-turret.glitch.me');
+const roomId = Telegram.WebApp?.initDataUnsafe?.start_param || 'default_room';
+const userId = Telegram.WebApp?.initDataUnsafe?.user?.id; // 👈 новый
    socket.on('connect', () => {
-    socket.emit('joinRoom', roomId);
+  socket.emit('joinRoom', {
+    roomId,
+    userId
+  });
     document.querySelectorAll('.emojiChoice').forEach(el => {
       el.onclick = () => {
         selectedEmoji = el.textContent;
