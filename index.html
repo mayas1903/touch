@@ -628,19 +628,35 @@ document.querySelectorAll('.gift-box').forEach(box => {
   });
 });
 
-    // --- WebSocket и инициализация ---
-const tgUser = Telegram.WebApp?.initDataUnsafe?.user || {};
-const roomId = Telegram.WebApp?.initDataUnsafe?.start_param || 'default_room';
+  // --- WebSocket и инициализация (с резервом для браузера) ---
+const isTelegram = typeof Telegram !== 'undefined' && Telegram.WebApp?.initDataUnsafe?.user;
+
+const tgUser = isTelegram
+  ? Telegram.WebApp.initDataUnsafe.user
+  : {
+      id: 'test_' + Math.random().toString(36).substring(2, 6),
+      first_name: 'Тест',
+      photo_url: 'https://i.pravatar.cc/32?u=' + Math.random()
+    };
+
+const roomId = isTelegram
+  ? Telegram.WebApp.initDataUnsafe.start_param || 'default_room'
+  : 'demo_room_' + tgUser.id;
+
 const userId = tgUser.id;
 const userName = tgUser.first_name || 'Ты';
 const photoUrl = tgUser.photo_url || 'https://via.placeholder.com/32';
+
 const socket = io('https://immense-fantasy-turret.glitch.me');
+
 // 👥 Переменные для отображения имени и аватарки
 let friendName = 'Друг';
 let friendAvatar = '';
 let myName = userName;
 let myAvatar = photoUrl;
+
 socket.on('connect', () => {
+  console.log('📡 WebSocket подключён');
   socket.emit('joinRoom', {
     roomId,
     userId,
@@ -648,6 +664,7 @@ socket.on('connect', () => {
     avatar: photoUrl
   });
 });
+
 // --- Выбор emoji ---
 document.querySelectorAll('.emojiChoice').forEach(el => {
   el.addEventListener('click', () => {
@@ -657,6 +674,7 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   });
 });
 document.querySelectorAll('.emojiChoice')[0]?.classList.add('selected');
+
 // --- Эффект от друга ---
 socket.on('friendTouch', ({ x, y, emoji }) => {
   friendTouches++;
@@ -671,6 +689,7 @@ socket.on('friendTouch', ({ x, y, emoji }) => {
   document.body.appendChild(emojiEl);
   setTimeout(() => emojiEl.remove(), 1700);
 });
+
 // --- Обработка касаний и имён ---
 socket.on('touchesCount', ({ total, state }) => {
   if (!state || !userId) return;
@@ -694,7 +713,7 @@ socket.on('touchesCount', ({ total, state }) => {
   updateCounter();
   updateProgressModal();
 });
-    
+
 // --- Обработка касания ---
 function handleTouch(x, y, target) {
   if (touchCooldown || isModalOpen) return;
@@ -725,6 +744,7 @@ function handleTouch(x, y, target) {
     emoji: selectedEmoji
   });
 }
+
 document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
     
 function startConfettiBurst() {
