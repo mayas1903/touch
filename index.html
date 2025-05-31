@@ -400,16 +400,16 @@
 
   <div id="rewardResultModal" class="modal">
     <h2>Ура! 🎉</h2>
-    <p id="rewardResultText">Вам выпал Telegram Premium на 3 месяца!</p>
+    <p id="rewardResultText">Вам выпало: Telegram Premium на 3 месяца!</p>
     <button id="closeRewardBtn">Активировать</button>
   </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     // --- ОБЩИЕ ПЕРЕМЕННЫЕ ---
-  let myTouches = 0;
-  let friendTouches = 0;
-  let totalTouches = 0;
+  let myTouches = 400;
+  let friendTouches = 400;
+  let totalTouches = 800;
   let touchCooldown = false;
   let isModalOpen = false;   // <-- объявляем перед использованием
   let savedNote = null;
@@ -484,7 +484,7 @@ noteButton.onclick = () => openModal(noteModal);
 
   function checkReward() {
     totalTouches = myTouches + friendTouches;
-    if (totalTouches >= 1000 && !rewardClaimed) {
+    if (totalTouches >= 10 && !rewardClaimed) {
       openModal(rewardAvailableModal);
     }
     if (savedNote && totalTouches >= noteThreshold && !noteShown) {
@@ -573,18 +573,28 @@ document.querySelectorAll('.gift-box').forEach(box => {
     `;
     document.body.appendChild(dotsLoader);
     setTimeout(() => {
-      document.getElementById('dotsLoader')?.remove();
-      document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
-      startConfettiBurst();
-      openModal(rewardResultModal);
-      document.querySelectorAll('.gift-box').forEach(b => {
-        b.classList.remove('opened');
-        b.style.pointerEvents = 'auto';
-      });
-    }, 2000);
+  document.getElementById('dotsLoader')?.remove();
+
+  const prizes = [
+    'Telegram Premium на 3 месяца 🔥',
+    'Telegram Premium на 1 месяц 🎀',
+    '100 звезд 🌟',
+    '500 звезд 🌟'
+  ];
+
+  const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
+  document.getElementById('rewardResultText').textContent = randomPrize;
+
+  startConfettiBurst();
+  openModal(rewardResultModal);
+
+  document.querySelectorAll('.gift-box').forEach(b => {
+    b.classList.remove('opened');
+    b.style.pointerEvents = 'auto';
+  });
+}, 2000);
   });
 });
-
 
     // Выбор emoji
 document.querySelectorAll('.emojiChoice').forEach(el => {
