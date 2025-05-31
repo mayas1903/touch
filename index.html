@@ -477,20 +477,19 @@ window.addEventListener('DOMContentLoaded', () => {
     console.warn("❌ Telegram WebApp недоступен");
     return;
   }
-
   Telegram.WebApp.ready(); // <-- Обязательно!
-
   const tgUser = Telegram.WebApp.initDataUnsafe?.user;
+  const tgUser = Telegram.WebApp.initDataUnsafe?.user;
+console.log('👤 Telegram User:', tgUser);
+
   if (!tgUser) {
     console.warn("❌ Telegram user не получен");
     return;
   }
-
   shareBtn.onclick = () => {
     const botUsername = "Vap14_robot";
     const roomId = tgUser.username || `id${tgUser.id}`;
     const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
-
     Telegram.WebApp.showPopup({
       title: "🔗 Поделиться ссылкой",
       message: `Вот твоя ссылка:\n${shareUrl}`,
