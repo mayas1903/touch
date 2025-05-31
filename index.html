@@ -551,10 +551,10 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     };
   }
-  
+
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
-    updateProgressModal();  // гарантируем, что перед прогрессом всё обновлено
+    updateProgressModal();
     isModalOpen = true;
     modal.classList.add('show');
   }
@@ -565,36 +565,37 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // --- ОБНОВЛЕНИЕ СЧЁТЧИКА И ПРОГРЕССА ---
   function updateCounter() {
-  const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
-  counter.textContent = `Ты: ${myTouches} | ${friendDisplayName}: ${friendTouches}`;
-}
-function updateProgressModal() {
-  totalTouches = myTouches + friendTouches;
-  const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
-  const friendDisplayAvatar = typeof friendAvatar !== 'undefined' ? friendAvatar : 'https://via.placeholder.com/32';
-  progressSummary.innerHTML = `
-    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <span style="display:flex;align-items:center;gap:6px;">
-        <img src="${photoUrl}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${myName}: ${myTouches}
-      </span>
-      |
-      <span style="display:flex;align-items:center;gap:6px;">
-        <img src="${friendDisplayAvatar}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${friendDisplayName}: ${friendTouches}
-      </span>
-    </div>
-  `;
-  progressText.textContent = `${totalTouches} / 1000`;
-  const max = 1000;
-  myProgress.style.width = `${Math.min(myTouches / max * 100, 100)}%`;
-  friendProgress.style.width = `${Math.min(friendTouches / max * 100, 100)}%`;
-}
+    const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
+    counter.textContent = `Ты: ${myTouches} | ${friendDisplayName}: ${friendTouches}`;
+  }
+
+  function updateProgressModal() {
+    totalTouches = myTouches + friendTouches;
+    const friendDisplayName = typeof friendName !== 'undefined' ? friendName : 'Друг';
+    const friendDisplayAvatar = typeof friendAvatar !== 'undefined' ? friendAvatar : 'https://via.placeholder.com/32';
+    progressSummary.innerHTML = `
+      <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="display:flex;align-items:center;gap:6px;">
+          <img src="${photoUrl}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${myName}: ${myTouches}
+        </span>
+        |
+        <span style="display:flex;align-items:center;gap:6px;">
+          <img src="${friendDisplayAvatar}" style="width:24px;height:24px;border-radius:50%;border:1px solid #ccc;"> ${friendDisplayName}: ${friendTouches}
+        </span>
+      </div>
+    `;
+    progressText.textContent = `${totalTouches} / 1000`;
+    const max = 1000;
+    myProgress.style.width = `${Math.min(myTouches / max * 100, 100)}%`;
+    friendProgress.style.width = `${Math.min(friendTouches / max * 100, 100)}%`;
+  }
 
   // --- ОБРАБОТКА ЗАПИСОК И ПОДАРКОВ ---
   saveNoteBtn.onclick = () => {
     const text = noteTextElm.value.trim();
-    const thr  = parseInt(noteThresholdEl.value, 10);
+    const thr = parseInt(noteThresholdEl.value, 10);
     if (text && thr > 0) {
-      savedNote    = text;
+      savedNote = text;
       noteThreshold = thr;
       closeModal(noteModal);
       alert(`✉️ Записка сохранена. Появится при ${thr} касаниях.`);
@@ -614,224 +615,92 @@ function updateProgressModal() {
   }
 
   // --- ОБРАБОТКА КНОПОК И СОБЫТИЙ ---
-closeProgressBtn.onclick = () => closeModal(progressModal);
-openRewardBtn.onclick = () => {
-  closeModal(rewardAvailableModal);
-  openModal(rewardLoadingModal);
-  setTimeout(() => {
-    closeModal(rewardLoadingModal);
-    openModal(document.getElementById('boxSelectionModal'));
-  }, 2000);
-};
-closeRewardBtn.onclick = () => {
-  rewardClaimed = true;
-  closeModal(rewardResultModal);
-  const spinner = document.createElement('div');
-  spinner.id = 'customSpinner';
-  spinner.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 20000;
-  `;
-  spinner.innerHTML = `
-    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
-      <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
-        stroke-dasharray="164.93361431346415 56.97787143782138">
-        <animateTransform attributeName="transform" type="rotate"
-          repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
-      </circle>
-    </svg>
-  `;
-  document.body.appendChild(spinner);
-  setTimeout(() => {
-    document.getElementById('customSpinner')?.remove();
-    alert('Подарок активирован! 🎁');
-  }, 2000);
-};
-
-helpButton.onclick = () => openModal(helpModal);
-counter.onclick = () => openModal(progressModal);
-
-    let animationPlayed = false;
-document.querySelectorAll('.gift-box').forEach(box => {
-  box.addEventListener('click', () => {
-    document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
-    box.classList.add('opened');
-    if (animationPlayed) return;
-    animationPlayed = true;
-
-    closeModal(document.getElementById('boxSelectionModal'));
-
-    const dotsLoader = document.createElement('div');
-    dotsLoader.id = 'dotsLoader';
-    dotsLoader.style.cssText = `
+  closeProgressBtn.onclick = () => closeModal(progressModal);
+  openRewardBtn.onclick = () => {
+    closeModal(rewardAvailableModal);
+    openModal(rewardLoadingModal);
+    setTimeout(() => {
+      closeModal(rewardLoadingModal);
+      openModal(document.getElementById('boxSelectionModal'));
+    }, 2000);
+  };
+  closeRewardBtn.onclick = () => {
+    rewardClaimed = true;
+    closeModal(rewardResultModal);
+    const spinner = document.createElement('div');
+    spinner.id = 'customSpinner';
+    spinner.style.cssText = `
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 20000;
-      display: flex;
-      gap: 5px;
     `;
-    dotsLoader.innerHTML = `
-      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite;"></span>
-      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.2s;"></span>
-      <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.4s;"></span>
-      <style>
-        @keyframes blink {
-          0%, 80%, 100% { opacity: 0; }
-          40% { opacity: 1; }
-        }
-      </style>
+    spinner.innerHTML = `
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#0088cc">
+        <circle cx="50" cy="50" r="35" fill="none" stroke="#0088cc" stroke-width="10" stroke-linecap="round"
+          stroke-dasharray="164.93361431346415 56.97787143782138">
+          <animateTransform attributeName="transform" type="rotate"
+            repeatCount="indefinite" dur="1s" from="0 50 50" to="360 50 50"/>
+        </circle>
+      </svg>
     `;
-    document.body.appendChild(dotsLoader);
+    document.body.appendChild(spinner);
     setTimeout(() => {
-      document.getElementById('dotsLoader')?.remove();
-      document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
-      startConfettiBurst();
-      openModal(rewardResultModal);
-      document.querySelectorAll('.gift-box').forEach(b => {
-        b.classList.remove('opened');
-        b.style.pointerEvents = 'auto';
-      });
+      document.getElementById('customSpinner')?.remove();
+      alert('Подарок активирован! 🎁');
     }, 2000);
-  });
-});
+  };
 
-// --- WebSocket и инициализация (с резервом для браузера) ---
-window.addEventListener('DOMContentLoaded', () => {
-  if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
-    console.warn("❌ Telegram WebApp недоступен");
-    return;
-  }
+  helpButton.onclick = () => openModal(helpModal);
+  counter.onclick = () => openModal(progressModal);
 
-  Telegram.WebApp.ready(); // обязательно!
+  let animationPlayed = false;
+  document.querySelectorAll('.gift-box').forEach(box => {
+    box.addEventListener('click', () => {
+      document.querySelectorAll('.gift-box').forEach(b => b.style.pointerEvents = 'none');
+      box.classList.add('opened');
+      if (animationPlayed) return;
+      animationPlayed = true;
 
-  const tgUser = Telegram.WebApp.initDataUnsafe?.user;
+      closeModal(document.getElementById('boxSelectionModal'));
 
-  if (!tgUser) {
-    console.warn("❌ Не удалось получить данные пользователя Telegram");
-    return;
-  }
-
-  console.log('👤 Telegram User:', tgUser); // отладка
-
-  // Получаем roomId из URL, если есть (для входа по ссылке)
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlRoomId = urlParams.get('roomId');
-
-  // Логика выбора roomId и viaLink
-  const viaLink = !!urlRoomId;
-  const savedPairRoom = localStorage.getItem('pairRoomId');
-
-  // Уникальный roomId для текущего пользователя (постоянный)
-  const permanentRoomId = tgUser.username || `id${tgUser.id}`;
-
-  // Выбираем roomId:
-  // если по ссылке — берём из ссылки
-  // иначе — либо сохранённая комната пары, либо постоянная
-  const roomId = viaLink ? urlRoomId : (savedPairRoom || permanentRoomId);
-
-  const userId = tgUser.id;
-  const userName = tgUser.first_name || 'Ты';
-  const photoUrl = tgUser.photo_url || 'https://via.placeholder.com/32';
-
-  const socket = io('https://immense-fantasy-turret.glitch.me');
-
-  // 👥 Переменные для отображения имени и аватарки
-  let friendName = 'Друг';
-  let friendAvatar = '';
-  let myName = userName;
-  let myAvatar = photoUrl;
-
-  socket.on('connect', () => {
-    console.log('📡 WebSocket подключён');
-    socket.emit('joinRoom', {
-      roomId,
-      userId,
-      name: userName,
-      avatar: photoUrl,
-      viaLink
+      const dotsLoader = document.createElement('div');
+      dotsLoader.id = 'dotsLoader';
+      dotsLoader.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 20000;
+        display: flex;
+        gap: 5px;
+      `;
+      dotsLoader.innerHTML = `
+        <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite;"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.2s;"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#0088cc;animation: blink 1s infinite 0.4s;"></span>
+        <style>
+          @keyframes blink {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
+          }
+        </style>
+      `;
+      document.body.appendChild(dotsLoader);
+      setTimeout(() => {
+        document.getElementById('dotsLoader')?.remove();
+        document.getElementById('rewardResultText').textContent = 'Вам выпал Telegram Premium на 3 месяца!';
+        startConfettiBurst();
+        openModal(rewardResultModal);
+        document.querySelectorAll('.gift-box').forEach(b => {
+          b.classList.remove('opened');
+          b.style.pointerEvents = 'auto';
+        });
+      }, 2000);
     });
   });
-
-  // --- Получение начальных данных и установка пары ---
-  socket.on('initialData', ({ my, friend }) => {
-    myTouches = my.count || 0;
-    myName = my.name || userName;
-    myAvatar = my.avatar || photoUrl;
-
-    if (friend) {
-      friendName = friend.name || 'Друг';
-      friendAvatar = friend.avatar || '';
-      friendTouches = friend.count || 0;
-
-      // Сохраняем комнату пары только если вход был по ссылке
-      if (viaLink) {
-        localStorage.setItem('pairRoomId', roomId);
-        console.log('✅ Пара сохранена:', roomId);
-      }
-    } else {
-      friendName = 'Друг';
-      friendAvatar = '';
-      friendTouches = 0;
-    }
-
-    updateCounter();
-    updateProgressModal();
-  });
-
-  // --- Выбор emoji ---
-  document.querySelectorAll('.emojiChoice').forEach(el => {
-    el.addEventListener('click', () => {
-      document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedEmoji = el.textContent;
-    });
-  });
-  document.querySelectorAll('.emojiChoice')[0]?.classList.add('selected');
-
-  // --- Эффект от друга ---
-  socket.on('friendTouch', ({ x, y, emoji }) => {
-    friendTouches++;
-    updateCounter();
-    updateProgressModal();
-    checkReward();
-    const emojiEl = document.createElement('div');
-    emojiEl.className = 'heart';
-    emojiEl.textContent = emoji;
-    emojiEl.style.left = `${x - 20}px`;
-    emojiEl.style.top = `${y - 20}px`;
-    document.body.appendChild(emojiEl);
-    setTimeout(() => emojiEl.remove(), 1700);
-  });
-
-  // --- Обработка касаний и имён (полное обновление) ---
-  socket.on('touchesCount', ({ state }) => {
-    if (!state || !userId) return;
-    const me = state[userId];
-    myTouches = me?.count || 0;
-    myName = me?.name || userName;
-    myAvatar = me?.avatar || photoUrl;
-    const friendEntry = Object.entries(state).find(([id]) => id !== String(userId));
-    if (friendEntry) {
-      const [, friendData] = friendEntry;
-      friendTouches = friendData.count || 0;
-      friendName = friendData.name || 'Друг';
-      friendAvatar = friendData.avatar || '';
-    } else {
-      friendTouches = 0;
-      friendName = 'Друг';
-      friendAvatar = '';
-    }
-    updateCounter();
-    updateProgressModal();
-  });
-
 });
-
 
 // --- Обработка касания ---
 function handleTouch(x, y, target) {
