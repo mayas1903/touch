@@ -264,49 +264,6 @@
   </style>
 </head>
 <body>
-<!-- Кнопка "Рисовать" рядом с "?" -->
-<button id="drawToggleBtn" style="
-  position: fixed;
-  bottom: 20px;
-  left: 70px;
-  width: 42px;
-  height: 42px;
-  background: #8e44ad;
-  border-radius: 50%;
-  color: white;
-  font-size: 22px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  z-index: 9999;
-">✏️</button>
-
-<!-- Палитра (вверх) -->
-<div id="colorPalette" style="
-  position: fixed;
-  bottom: 70px;
-  left: 70px;
-  z-index: 9999;
-  display: none;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: 6px;
-">
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #00ffff; box-shadow: 0 0 6px #00ffff;" data-color="#00ffff"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff00ff; box-shadow: 0 0 6px #ff00ff;" data-color="#ff00ff"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #00ff00; box-shadow: 0 0 6px #00ff00;" data-color="#00ff00"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ffff00; box-shadow: 0 0 6px #ffff00;" data-color="#ffff00"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff0000; box-shadow: 0 0 6px #ff0000;" data-color="#ff0000"></div>
-  <div style="width: 24px; height: 24px; border-radius: 50%; background: #0000ff; box-shadow: 0 0 6px #0000ff;" data-color="#0000ff"></div>
-  <button id="clearCanvasBtn" style="margin-top: 6px; padding: 4px 6px; font-size: 12px;">🗑</button>
-  <button id="saveCanvasBtn" style="padding: 4px 6px; font-size: 12px;">💾</button>
-</div>
-
-<!-- Canvas -->
-<canvas id="drawCanvas" style="position: fixed; top: 0; left: 0; z-index: 5000; display: none;"></canvas>
 
   <!-- Кнопка помощи -->
 <div id="helpButton" style="
@@ -489,84 +446,6 @@
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
- let drawMode = false;
-let isDrawing = false;
-let ctx;
-let currentColor = "#00ffff";
-
-const canvas = document.getElementById('drawCanvas');
-const toggleBtn = document.getElementById('drawToggleBtn');
-const colorPalette = document.getElementById('colorPalette');
-const clearBtn = document.getElementById('clearCanvasBtn');
-const saveBtn = document.getElementById('saveCanvasBtn');
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-toggleBtn.onclick = () => {
-  drawMode = !drawMode;
-  canvas.style.display = drawMode ? 'block' : 'none';
-  colorPalette.style.display = drawMode ? 'flex' : 'none';
-};
-
-canvas.addEventListener('pointerdown', e => {
-  if (!drawMode) return;
-  isDrawing = true;
-  ctx.beginPath();
-  ctx.moveTo(e.clientX, e.clientY);
-  socket.emit('startLine', {
-    roomId,
-    x: e.clientX,
-    y: e.clientY,
-    color: currentColor
-  });
-});
-
-canvas.addEventListener('pointermove', e => {
-  if (!drawMode || !isDrawing) return;
-  ctx.lineTo(e.clientX, e.clientY);
-  ctx.stroke();
-  socket.emit('drawLine', {
-    roomId,
-    x: e.clientX,
-    y: e.clientY,
-    color: currentColor
-  });
-});
-
-canvas.addEventListener('pointerup', () => {
-  if (!drawMode) return;
-  isDrawing = false;
-});
-
-ctx = canvas.getContext('2d');
-ctx.lineWidth = 4;
-ctx.lineJoin = 'round';
-ctx.lineCap = 'round';
-ctx.strokeStyle = currentColor;
-
-document.querySelectorAll('#colorPalette [data-color]').forEach(el => {
-  el.onclick = () => {
-    currentColor = el.getAttribute('data-color');
-    ctx.strokeStyle = currentColor;
-  };
-});
-
-clearBtn.onclick = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-};
-
-saveBtn.onclick = () => {
-  const link = document.createElement('a');
-  link.download = 'рисунок.png';
-  link.href = canvas.toDataURL();
-  link.click();
-};   
-    
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
     updateProgressModal();  // гарантируем, что перед прогрессом всё обновлено
@@ -650,6 +529,7 @@ closeRewardBtn.onclick = () => {
     </svg>
   `;
   document.body.appendChild(spinner);
+
   setTimeout(() => {
     document.getElementById('customSpinner')?.remove();
     alert('Подарок активирован! 🎁');
@@ -666,7 +546,9 @@ document.querySelectorAll('.gift-box').forEach(box => {
     box.classList.add('opened');
     if (animationPlayed) return;
     animationPlayed = true;
+
     closeModal(document.getElementById('boxSelectionModal'));
+
     const dotsLoader = document.createElement('div');
     dotsLoader.id = 'dotsLoader';
     dotsLoader.style.cssText = `
@@ -702,6 +584,8 @@ document.querySelectorAll('.gift-box').forEach(box => {
     }, 2000);
   });
 });
+
+
     // Выбор emoji
 document.querySelectorAll('.emojiChoice').forEach(el => {
   el.addEventListener('click', () => {
@@ -711,25 +595,22 @@ document.querySelectorAll('.emojiChoice').forEach(el => {
   });
 });
     
-// --- ОБРАБОТЧИК КАСАНИЙ ---
-function handleTouch(x, y, target) {
+  // --- ОБРАБОТЧИК КАСАНИЙ ---
+  function handleTouch(x, y, target) {
   if (touchCooldown || isModalOpen) return;
-  const forbidden = ['modal', 'emojiSelector', 'emojiChoice', 'gift-box'];
+  const forbidden = ['modal','emojiSelector','emojiChoice','gift-box'];
   if (
     forbidden.some(cls => target.closest(`.${cls}`)) ||
-    ['counter', 'helpButton'].includes(target.id) ||
+    ['counter','helpButton'].includes(target.id) ||
     target.closest('button')
   ) return;
-if (drawMode) return; // отключаем эмодзи в режиме рисования
   touchCooldown = true;
   setTimeout(() => touchCooldown = false, 100);
-
   myTouches++;
   updateCounter();
   updateProgressModal();
-  checkReward();
-
-  // Добавляем визуальный эмодзи
+  checkReward(); 
+  // 🆕 Добавляем визуальный эмодзи
   const emoji = document.createElement('div');
   emoji.className = 'heart';
   emoji.textContent = selectedEmoji;
@@ -737,40 +618,36 @@ if (drawMode) return; // отключаем эмодзи в режиме рис�
   emoji.style.top = `${y - 20}px`;
   document.body.appendChild(emoji);
   setTimeout(() => emoji.remove(), 3000);
-
-  socket.emit('touch', {
+    socket.emit('touch', {
     roomId,
     x,
     y,
     emoji: selectedEmoji
   });
 }
-document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
 
-// --- WEBSOCKET ПОДКЛЮЧЕНИЕ ---
-const socket = io('https://immense-fantasy-turret.glitch.me');
-const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
+  document.body.addEventListener('pointerdown', e => handleTouch(e.clientX, e.clientY, e.target));
 
-socket.on('connect', () => {
-  socket.emit('joinRoom', roomId);
-
-  document.querySelectorAll('.emojiChoice').forEach(el => {
-    el.onclick = () => {
-      selectedEmoji = el.textContent;
-      document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
-      el.classList.add('selected');
-    };
+  // --- WEBSOCKET + ЭМОДЗИ ---
+  const socket = io('https://immense-fantasy-turret.glitch.me');
+  const roomId = window.Telegram?.WebApp?.initDataUnsafe?.chat.id || 'default_room';
+   socket.on('connect', () => {
+    socket.emit('joinRoom', roomId);
+    document.querySelectorAll('.emojiChoice').forEach(el => {
+      el.onclick = () => {
+        selectedEmoji = el.textContent;
+        document.querySelectorAll('.emojiChoice').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+      };
+    });
+    document.querySelectorAll('.emojiChoice')[0].classList.add('selected');
   });
-  document.querySelectorAll('.emojiChoice')[0].classList.add('selected');
-});
-
-// --- ПОЛУЧЕНИЕ КАСАНИЯ ОТ ДРУГА ---
-socket.on('friendTouch', ({ x, y, emoji }) => {
+  socket.on('friendTouch', ({x, y, emoji}) => {
   friendTouches++;
   updateCounter();
   updateProgressModal();
   checkReward();
-
+  // Показываем эмодзи от друга
   const emojiEl = document.createElement('div');
   emojiEl.className = 'heart';
   emojiEl.textContent = emoji;
@@ -780,24 +657,10 @@ socket.on('friendTouch', ({ x, y, emoji }) => {
   setTimeout(() => emojiEl.remove(), 3000);
 });
 
-// --- ПОЛУЧЕНИЕ РИСОВАНИЯ ОТ ДРУГА ---
-socket.on('startLine', ({ x, y, color }) => {
-  if (!ctx) return;
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  ctx.moveTo(x, y);
-});
-
-socket.on('drawLine', ({ x, y, color }) => {
-  if (!ctx) return;
-  ctx.strokeStyle = color;
-  ctx.lineTo(x, y);
-  ctx.stroke();
-});
-
 function startConfettiBurst() {
   const NUM_CONFETTI = 320;
   const colors = ['#FF3CAC', '#FF9A8B', '#F6D365', '#42E695', '#2F80ED', '#FFD700', '#FF6F61', '#8A2BE2'];
+
   if (!document.getElementById('confetti-3d-style')) {
     const style = document.createElement('style');
     style.id = 'confetti-3d-style';
@@ -811,18 +674,22 @@ function startConfettiBurst() {
     `;
     document.head.appendChild(style);
   }
+
   for (let i = 0; i < NUM_CONFETTI; i++) {
     const confetti = document.createElement('div');
     const size = 6 + Math.random() * 12;
     const color = colors[Math.floor(Math.random() * colors.length)];
+    
     // Случайная траектория
     const angle = Math.random() * 2 * Math.PI;
     const distance = 300 + Math.random() * 500;
     const x = Math.cos(angle) * distance;
     const y = Math.sin(angle) * distance;
+
     const rz = `${Math.random() * 720 - 360}deg`;
     const ry = `${Math.random() * 180 - 90}deg`;
     const duration = 1.5 + Math.random() * 0.8;
+
     confetti.style.cssText = `
       position: fixed;
       top: 50%;
@@ -838,11 +705,14 @@ function startConfettiBurst() {
       pointer-events: none;
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
     `;
+
     confetti.style.setProperty('--x', `${x}px`);
     confetti.style.setProperty('--y', `${y}px`);
     confetti.style.setProperty('--rz', rz);
     confetti.style.setProperty('--ry', ry);
+
     document.body.appendChild(confetti);
+
     setTimeout(() => confetti.remove(), duration * 1000 + 100);
   }
 }
