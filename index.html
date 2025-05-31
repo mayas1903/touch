@@ -467,20 +467,28 @@
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
-const shareButton = document.getElementById("shareButton");
-if (typeof Telegram !== 'undefined' && Telegram.WebApp?.initDataUnsafe?.user) {
-  const tgUser = Telegram.WebApp.initDataUnsafe.user;
-  const botUsername = "Vap14_robot"; // Замени на имя твоего бота
-  const roomId = tgUser.username || `id${tgUser.id}`;
-  const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
-  shareButton.onclick = () => {
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      alert("Ссылка скопирована:\n" + shareUrl);
+const shareBtn = document.getElementById("shareButton");
+
+if (shareBtn && typeof Telegram !== "undefined" && Telegram.WebApp?.initDataUnsafe?.user) {
+  shareBtn.onclick = () => {
+    const tgUser = Telegram.WebApp.initDataUnsafe.user;
+    const botUsername = "Vap14_robot";
+    const roomId = tgUser.username || `id${tgUser.id}`;
+    const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
+
+    Telegram.WebApp.showPopup({
+      title: "Поделиться ссылкой",
+      message: `Вот твоя ссылка:\n${shareUrl}`,
+      buttons: [
+        { type: "copy", text: "Скопировать" },
+        { type: "close", text: "Закрыть" }
+      ]
     });
   };
 } else {
-  shareButton.style.display = 'none';
+  console.warn("Telegram WebApp недоступен или пользователь не найден.");
 }
+
 
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
