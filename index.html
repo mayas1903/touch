@@ -467,16 +467,20 @@
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
- document.getElementById("shareButton").onclick = () => {
-  const botUsername = "Vap14_robot"; // 👈 замени на своего
+document.getElementById("shareButton").onclick = () => {
+  const botUsername = "Vap14_robot"; // 🔁 Заменить на своего
+  if (typeof Telegram === 'undefined' || !Telegram.WebApp?.initDataUnsafe?.user) {
+    alert("⛔️ Кнопка работает только внутри Telegram бота.");
+    return;
+  }
   const tgUser = Telegram.WebApp.initDataUnsafe.user;
-  // Надёжный постоянный roomId
   const roomId = tgUser.username || `id${tgUser.id}`;
   const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
   navigator.clipboard.writeText(shareUrl).then(() => {
-    alert("Ссылка скопирована:\n" + shareUrl);
+    alert("✅ Ссылка скопирована:\n" + shareUrl);
   });
 };
+
 
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
