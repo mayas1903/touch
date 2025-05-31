@@ -467,20 +467,24 @@
 const noteButton = document.getElementById('noteButton');
 noteButton.onclick = () => openModal(noteModal);
 
-document.getElementById("shareButton").onclick = () => {
-  const botUsername = "Vap14_robot"; // 🔁 Заменить на своего
-  if (typeof Telegram === 'undefined' || !Telegram.WebApp?.initDataUnsafe?.user) {
-    alert("⛔️ Кнопка работает только внутри Telegram бота.");
-    return;
-  }
+const shareButton = document.getElementById("shareButton");
+if (typeof Telegram !== 'undefined' && Telegram.WebApp?.initDataUnsafe?.user) {
   const tgUser = Telegram.WebApp.initDataUnsafe.user;
+  const botUsername = "Vap14_robot"; // 👈 замени на своё имя бота
   const roomId = tgUser.username || `id${tgUser.id}`;
   const shareUrl = `https://t.me/${botUsername}?startapp=${roomId}`;
-  navigator.clipboard.writeText(shareUrl).then(() => {
-    alert("✅ Ссылка скопирована:\n" + shareUrl);
-  });
-};
 
+  shareButton.onclick = () => {
+    Telegram.WebApp.openTelegramLink(shareUrl);
+    // Альтернативно, если хочешь просто скопировать:
+    // navigator.clipboard.writeText(shareUrl).then(() => {
+    //   alert("Ссылка скопирована:\n" + shareUrl);
+    // });
+  };
+} else {
+  // Не в Telegram — можно скрыть кнопку
+  shareButton.style.display = 'none';
+}
 
   // --- ФУНКЦИИ МОДАЛОК ---
   function openModal(modal) {
